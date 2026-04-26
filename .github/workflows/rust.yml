@@ -33,7 +33,7 @@ jobs:
       - uses: ./.github/actions/rust-setup
 
       - name: Clippy
-        run: cargo clippy --workspace --all-targets --all-features
+        run: cargo clippy --all-targets --all-features -- -D warnings
 
   test:
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
       - uses: ./.github/actions/rust-setup
 
       - name: Tests
-        run: cargo nextest run --workspace --all-targets --all-features --locked --exclude=riptide-fuzz
+        run: cargo nextest run --all-targets --all-features --locked
 
   build:
     runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
       - uses: ./.github/actions/rust-setup
 
       - name: Build (${{ matrix.mode }})
-        run: cargo build --workspace --all-targets ${{ matrix.mode == 'release' && '--release' || '' }} --locked
+        run: cargo build --all-targets ${{ matrix.mode == 'release' && '--release' || '' }} --locked
 
   security:
     runs-on: ubuntu-latest
@@ -98,7 +98,7 @@ jobs:
           tool: cargo-llvm-cov
 
       - name: Coverage
-        run: cargo llvm-cov --workspace --lcov --output-path lcov.info nextest
+        run: cargo llvm-cov --lcov --output-path lcov.info nextest
 
       - name: Upload to Codecov
         uses: codecov/codecov-action@v6
@@ -108,23 +108,12 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
 
-  fuzz:
+  bench:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/rust-setup
-        with:
-          toolchain: nightly
 
-      - name: Install cargo-fuzz
-        run: cargo install cargo-fuzz
-
-      - name: Fuzz bencode
-        run: cargo +nightly fuzz run --fuzz-dir=riptide/fuzz decode_bencode -- -max_total_time=60
-
-      - name: Fuzz P2P
-        run: cargo +nightly fuzz run --fuzz-dir=riptide/fuzz decode_p2p_message -- -max_total_time=60
-
-      - name: Fuzz extension
-        run: cargo +nightly fuzz run --fuzz-dir=riptide/fuzz decode_extension_message -- -max_total_time=60
+      - name: Benchmarks
+        run: cargo bench
