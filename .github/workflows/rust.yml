@@ -93,7 +93,7 @@ jobs:
       - uses: ./.github/actions/rust-setup
 
       - name: Install llvm-cov
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@v2.78.1
         with:
           tool: cargo-llvm-cov
 
