@@ -1,5 +1,11 @@
 # my-crate
 
+[![CI](https://github.com/qkniep/my-crate/actions/workflows/rust.yml/badge.svg)](https://github.com/qkniep/my-crate/actions/workflows/rust.yml)
+[![crates.io](https://img.shields.io/crates/v/my-crate.svg)](https://crates.io/crates/my-crate)
+[![docs.rs](https://img.shields.io/docsrs/my-crate)](https://docs.rs/my-crate)
+[![codecov](https://codecov.io/gh/qkniep/my-crate/branch/main/graph/badge.svg)](https://codecov.io/gh/qkniep/my-crate)
+[![license](https://img.shields.io/crates/l/my-crate.svg)](#license)
+
 TODO: Write a description.
 
 ## Usage
@@ -7,12 +13,12 @@ TODO: Write a description.
 ```rust
 use my_crate::add;
 
-let result = add(2, 3);
+assert_eq!(add(2, 3), 5);
 ```
 
 ## License
 
-Licensed under either of [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) or [MIT license](http://opensource.org/licenses/MIT) at your option.
+Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option.
 
 ### Contribution
 
