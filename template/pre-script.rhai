@@ -25,9 +25,11 @@ if is_lib {
 // --- Publishing -----------------------------------------------------------
 // release-plz drives crates.io publishing + changelog; semver checks guard a
 // published library's public API. Neither applies to unpublished crates, and
-// semver checks are library-only.
+// semver checks are library-only. The PR-title lint only matters because
+// release-plz reads squash-merged PR titles, so it's gated the same way.
 if !publish {
     file::delete(".github/workflows/release-plz.yml");
+    file::delete(".github/workflows/pr-title.yml");
 }
 if !(is_lib && publish) {
     file::delete(".github/workflows/semver.yml");

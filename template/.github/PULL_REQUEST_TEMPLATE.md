@@ -11,4 +11,4 @@
 - [ ] `just check` passes locally
 - [ ] Tests added or updated
 - [ ] Docs / `CHANGELOG.md` updated if user-facing
-- [ ] Commits follow [Conventional Commits](https://www.conventionalcommits.org)
+- [ ] PR title follows [Conventional Commits](https://www.conventionalcommits.org) (it becomes the squash commit message)

@@ -34,11 +34,19 @@ Run `just check`, which mirrors CI:
 If any tool is missing, `just check` says so and points you back to `just setup`.
 Run `just` with no arguments to list all available recipes.
 {% if publish %}
-## Commit messages
+## Pull request titles
 
-This project releases with [release-plz](https://release-plz.dev), which derives
-version bumps and the changelog from [Conventional Commits](https://www.conventionalcommits.org).
-Prefix commits with `feat:`, `fix:`, `docs:`, `chore:`, etc.
+Pull requests are squash-merged, so the **PR title** becomes the single commit
+message on `main`. This project releases with [release-plz](https://release-plz.dev),
+which derives version bumps and the changelog from those commit messages, so give
+each PR a [Conventional Commits](https://www.conventionalcommits.org) title —
+prefix it with `feat:`, `fix:`, `docs:`, `chore:`, etc. Individual commits within a
+PR can be anything; they're squashed away on merge.
+
+A CI check (`pr-title.yml`) enforces this. While a PR is still in progress, prefix
+its title with `[WIP] ` to mark it as such: the check then stays pending rather
+than failing, and clears once you drop the prefix and give the PR a real type.
+(GitHub draft PRs work too.)
 {% endif %}
 ## Licensing
 

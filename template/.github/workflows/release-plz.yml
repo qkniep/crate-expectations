@@ -1,6 +1,7 @@
 # Automates releases with release-plz (https://release-plz.dev):
 #   * "release-plz-pr" opens/updates a release PR that bumps the version and
-#     updates CHANGELOG.md from your conventional commits.
+#     updates CHANGELOG.md from the Conventional Commit titles of your
+#     squash-merged PRs (enforced by pr-title.yml).
 #   * "release-plz-release" publishes to crates.io and tags the release once that
 #     PR is merged.
 #

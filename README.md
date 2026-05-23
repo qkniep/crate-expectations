@@ -1,16 +1,17 @@
 # General Rust Project Template
 
 A [cargo-generate](https://cargo-generate.github.io) template for new Rust
-projects. One source generates any of these, each producing a project whose
-`just check` is green from the first commit:
+projects. One source generates one of two archetypes, each producing a project
+whose `just check` is green from the first commit:
 
-- a **library**, published to crates.io or kept internal,
-- an **application** (binary), and
-- a **`no_std` / security-critical library**.
+- a **library** — published to crates.io or kept internal, and optionally
+  `no_std` and/or security-hardened, or
+- an **application** (binary).
 
-Hardening and CI capabilities (Miri, fuzzing, sanitizers, coverage, …) are
-**independent toggles**, so you can mix them with any archetype — fuzz a binary,
-run Miri on an internal lib, and so on.
+Hardening and CI capabilities (Miri, fuzzing, sanitizers, coverage, OSSF
+Scorecard, …) are **independent toggles** you mix with either archetype, so a
+`no_std` / security-critical library is just a library with the right toggles
+set — fuzz a binary, run Miri on an internal lib, and so on.
 
 ## Quick start
 
