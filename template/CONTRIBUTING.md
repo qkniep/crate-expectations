@@ -5,9 +5,9 @@ Thanks for taking the time to contribute!
 ## Getting started
 
 ```sh
-git clone https://github.com/qkniep/my-crate
-cd my-crate
-cargo install just   # or: brew install just — bootstraps the command runner
+git clone https://github.com/{{ gh_username }}/{{ project-name }}
+cd {{ project-name }}
+cargo install just   # bootstraps the command runner
 just setup           # installs the nightly toolchain + dev tools
 just check           # runs the full local check suite (see below)
 ```
@@ -27,17 +27,19 @@ Run `just check`, which mirrors CI:
 - `cargo nextest run` and `cargo test --doc` — tests
 - `cargo doc` — docs build cleanly
 - `cargo deny check`, `cargo machete`, `typos` — supply chain & spelling
+{%- if benchmarks %}
 - `cargo bench --no-run` — benchmarks compile (CI doesn't run them; use `just bench` to run locally)
+{%- endif %}
 
 If any tool is missing, `just check` says so and points you back to `just setup`.
 Run `just` with no arguments to list all available recipes.
-
+{% if publish %}
 ## Commit messages
 
 This project releases with [release-plz](https://release-plz.dev), which derives
 version bumps and the changelog from [Conventional Commits](https://www.conventionalcommits.org).
 Prefix commits with `feat:`, `fix:`, `docs:`, `chore:`, etc.
-
+{% endif %}
 ## Licensing
 
 By contributing you agree that your contributions are dual licensed under the

@@ -1,0 +1,124 @@
+name: Template CI
+
+# This is the template's own quality gate. Because the files under template/ hold
+# Liquid placeholders, they aren't a compilable project on their own — so instead
+# of checking them in place, this workflow generates a representative set of
+# archetypes and runs the full `just check` on each. If any combination the
+# template advertises stops producing a green project, this goes red.
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+concurrency:
+  group: template-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-and-check:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: published-library
+            args: "-d kind=library -d publish=true"
+          - name: internal-library
+            args: "-d kind=library -d publish=false"
+          - name: application
+            args: "-d kind=binary -d publish=false"
+          # The kitchen sink: no_std, unsafe allowed-but-denied, every hardening
+          # capability on. `just check` runs the core suite; the capability
+          # workflows (miri, sanitizers, ...) are validated by actionlint below.
+          - name: no_std-security-library
+            args: "-d kind=library -d no_std=true -d unsafe_policy=deny -d miri=true -d sanitizers=true -d careful=true -d scorecard=true -d fuzzing=true -d bench_gating=true"
+          # Proves capabilities are decoupled from archetype (fuzzing on a normal lib).
+          - name: library-with-fuzzing
+            args: "-d kind=library -d publish=true -d fuzzing=true"
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      # nightly provides `cargo +nightly fmt`; stable is installed last so it is
+      # the default toolchain `just check` builds and tests with.
+      - uses: dtolnay/rust-toolchain@5b842231ba77f5c045dba54ac5560fed2db780e2 # nightly
+        with:
+          components: rustfmt
+      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+
+      - name: Install dev tools
+        uses: taiki-e/install-action@6c1f7cf125e42770ff087ea443901b487cc5471a # v2
+        with:
+          tool: just,cargo-nextest,cargo-deny,cargo-machete,typos
+
+      - name: Install cargo-generate
+        uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
+      - run: cargo binstall -y cargo-generate
+
+      - name: Install actionlint
+        env:
+          ACTIONLINT_VERSION: "1.7.7"
+          ACTIONLINT_SHA256: "023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0757"
+        run: |
+          curl -fsSL -o actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  actionlint.tar.gz" | sha256sum -c -
+          tar -xz -C /usr/local/bin -f actionlint.tar.gz actionlint
+
+      - name: Generate project
+        env:
+          ARGS: ${{ matrix.args }}
+        run: |
+          # cargo-generate requires --destination to already exist (it won't
+          # create the parent), so make it first.
+          mkdir -p "$RUNNER_TEMP/gen"
+          # shellcheck disable=SC2086  # intentional word-splitting of the arg list
+          cargo generate --path ./template --name testproj --silent \
+            --destination "$RUNNER_TEMP/gen" $ARGS
+
+      - name: Run full check suite
+        working-directory: ${{ runner.temp }}/gen/testproj
+        run: just check
+
+      - name: Lint generated workflows
+        working-directory: ${{ runner.temp }}/gen/testproj
+        run: actionlint
+
+  no-std-build:
+    name: no_std target build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+        with:
+          targets: thumbv7em-none-eabihf
+
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+
+      - name: Install cargo-generate
+        uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
+      - run: cargo binstall -y cargo-generate
+
+      - name: Generate no_std library
+        run: |
+          mkdir -p "$RUNNER_TEMP/gen"
+          cargo generate --path ./template --name nostdproj --silent --destination "$RUNNER_TEMP/gen" -d kind=library -d no_std=true -d unsafe_policy=deny
+
+      # Proves the generated no_std crate genuinely builds without std on a
+      # bare-metal target — the promise of the no_std archetype. No --locked: a
+      # freshly generated project has no Cargo.lock yet, and this job builds it
+      # directly rather than through `just check` (which would create one).
+      - name: Build without std
+        working-directory: ${{ runner.temp }}/gen/nostdproj
+        run: cargo build --no-default-features --target thumbv7em-none-eabihf

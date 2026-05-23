@@ -1,0 +1,40 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    # Look for `Cargo.toml` and `Cargo.lock` in the root directory
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+    groups:
+      cargo-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 5
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+    groups:
+      github-actions:
+        update-types:
+          - "minor"
+          - "patch"

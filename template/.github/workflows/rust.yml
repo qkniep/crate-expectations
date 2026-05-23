@@ -1,0 +1,125 @@
+name: Rust
+
+# Least privilege: every job here only reads the repo. Scope up per-job if one
+# ever needs to write (e.g. commit, comment, or push).
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+concurrency:
+  group: rust-${{ github.ref }}
+  cancel-in-progress: true
+
+# This is the always-on core suite. Optional checks live in their own workflow
+# files (coverage.yml, msrv.yml, semver.yml, bench.yml, miri.yml, sanitizers.yml,
+# careful.yml, scorecard.yml, no-std.yml) so a project can drop one by deleting a
+# single file — which is exactly what the generator does for unselected options.
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Install nightly toolchain
+        uses: dtolnay/rust-toolchain@5b842231ba77f5c045dba54ac5560fed2db780e2 # nightly
+        with:
+          components: rustfmt
+
+      - name: Check formatting
+        run: cargo +nightly fmt --all -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: ./.github/actions/rust-setup
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: ./.github/actions/rust-setup
+
+      - name: Tests
+        run: cargo nextest run --all-targets --all-features --locked
+
+      # nextest doesn't run doctests, so run them separately to match `just check`.
+      - name: Doctests
+        run: cargo test --doc --all-features --locked
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [debug, release]
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: ./.github/actions/rust-setup
+
+      - name: Build (${{ matrix.mode }})
+        run: cargo build --all-targets ${{ matrix.mode == 'release' && '--release' || '' }} --locked
+
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: ./.github/actions/rust-setup
+
+      - name: Cargo deny (advisories, licenses, bans, sources)
+        run: cargo deny check
+
+      - name: Unused deps
+        run: cargo machete
+
+  docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: ./.github/actions/rust-setup
+
+      - name: Build docs
+        run: RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features --document-private-items --locked
+
+  typos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Check spelling
+        uses: crate-ci/typos@7b04f660f4ee4f048d18fd341887cf28dfbedfe2 # v1
+
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      # Lints these workflow files for syntax errors, bad expressions, and (via the
+      # runner's preinstalled shellcheck) issues in `run:` scripts. Pinned to a
+      # release rather than a marketplace action to keep the dependency auditable;
+      # the tarball is checksum-verified before extraction.
+      - name: actionlint
+        env:
+          ACTIONLINT_VERSION: "1.7.7"
+          ACTIONLINT_SHA256: "023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0757"
+        run: |
+          curl -fsSL -o actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  actionlint.tar.gz" | sha256sum -c -
+          tar -xz -f actionlint.tar.gz actionlint
+          ./actionlint -color

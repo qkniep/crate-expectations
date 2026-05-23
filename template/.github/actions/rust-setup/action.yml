@@ -10,13 +10,13 @@ runs:
   using: "composite"
   steps:
     - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
+      uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
       with:
         toolchain: ${{ inputs.toolchain }}
         components: rustfmt, clippy
 
     - name: Install cargo tools
-      uses: taiki-e/install-action@v2
+      uses: taiki-e/install-action@6c1f7cf125e42770ff087ea443901b487cc5471a # v2
       with:
         tool: nextest,cargo-deny,cargo-machete
 
@@ -25,9 +25,18 @@ runs:
     # work against each other. rust-cache alone is simpler and faster for a
     # library-sized crate; reach for sccache only on large dependency graphs.
     - name: Rust cache
-      uses: Swatinem/rust-cache@v2
+      uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
       with:
         cache-all-crates: true
+
+    # cargo-generate ships no Cargo.lock, so a freshly generated project has none
+    # until its first local build. Generate one here so the `--locked` steps in the
+    # jobs that use this action work on the very first push — keeping the README's
+    # "green from the first commit" promise. A no-op once a lock is committed, so
+    # `--locked`'s drift detection stays fully intact.
+    - name: Ensure Cargo.lock
+      shell: bash
+      run: test -f Cargo.lock || cargo generate-lockfile
 
     - name: Set env
       shell: bash

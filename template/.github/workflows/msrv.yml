@@ -1,0 +1,49 @@
+name: MSRV
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+concurrency:
+  group: msrv-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  msrv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      # Single source of truth: read `rust-version` from Cargo.toml so the MSRV
+      # check can never drift from what the crate declares. Both `cargo` and `jq`
+      # are preinstalled on the runner image.
+      - name: Read MSRV from Cargo.toml
+        id: msrv
+        run: |
+          version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].rust_version')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Install MSRV toolchain
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9 # master
+        with:
+          toolchain: ${{ steps.msrv.outputs.version }}
+
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+
+      # A freshly generated project ships no Cargo.lock; create one with the MSRV
+      # toolchain (so its lock-file format is one MSRV can read) so the --locked
+      # check below works on the first push. No-op once a lock is committed.
+      - name: Ensure Cargo.lock
+        env:
+          MSRV: ${{ steps.msrv.outputs.version }}
+        run: test -f Cargo.lock || cargo "+$MSRV" generate-lockfile
+
+      - name: Check
+        env:
+          MSRV: ${{ steps.msrv.outputs.version }}
+        run: cargo "+$MSRV" check --all-features --locked

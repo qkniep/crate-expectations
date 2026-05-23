@@ -1,0 +1,25 @@
+# Standalone crate for cargo-fuzz targets. It path-depends on the parent crate
+# and is invisible to it (not a workspace member, not under src/), so it never
+# affects `cargo build`/`cargo doc` of the library itself. Run with `just fuzz`
+# or `cargo +nightly fuzz run fuzz_target_1`.
+[package]
+name = "{{ project-name }}-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies."{{ project-name }}"]
+path = ".."
+
+[[bin]]
+name = "fuzz_target_1"
+path = "fuzz_targets/fuzz_target_1.rs"
+test = false
+doc = false
+bench = false

@@ -6,9 +6,9 @@ Please **do not** open a public issue for security vulnerabilities.
 
 Report them privately via either:
 
-- GitHub's [private vulnerability reporting](https://github.com/qkniep/my-crate/security/advisories/new)
+- GitHub's [private vulnerability reporting](https://github.com/{{ gh_username }}/{{ project-name }}/security/advisories/new)
   (Security tab → "Report a vulnerability"), or
-- email to <hello@quentinkniep.com>.
+- email to <{{ email }}>.
 
 Please include a description, reproduction steps, and the affected version. You
 can expect an initial response within a few days. Once a fix is available, a
