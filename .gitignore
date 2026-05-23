@@ -1,8 +1,4 @@
-# The repo root is not a crate (the template lives under template/), but ignore
-# build output anyway in case you run `cargo generate --path ./template` here to
-# test, and tidy up the usual cruft.
-/target
-/scratch
+/todo.txt
 *.swp
 *.swo
 *~
