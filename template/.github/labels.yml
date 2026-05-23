@@ -1,0 +1,28 @@
+# Declarative label set, synced to the repo by the labeler workflow
+# (.github/workflows/labeler.yml). Edit here, not in the GitHub UI, so the labels
+# stay version-controlled. These cover the labels referenced elsewhere in the
+# template (Dependabot's `dependencies`, the issue templates' `bug`/`enhancement`).
+- name: bug
+  color: d73a4a
+  description: Something isn't working
+- name: enhancement
+  color: a2eeef
+  description: New feature or request
+- name: dependencies
+  color: 0366d6
+  description: Dependency updates
+- name: documentation
+  color: 0075ca
+  description: Documentation changes
+- name: ci
+  color: ededed
+  description: CI, tooling, and automation
+- name: security
+  color: ee0701
+  description: Security-sensitive changes or reports
+- name: good first issue
+  color: 7057ff
+  description: Good for newcomers
+- name: help wanted
+  color: 008672
+  description: Extra attention is needed

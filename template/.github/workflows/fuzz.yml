@@ -1,0 +1,40 @@
+name: Fuzz
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: fuzz-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Install nightly
+        uses: dtolnay/rust-toolchain@5b842231ba77f5c045dba54ac5560fed2db780e2 # nightly
+
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+        with:
+          workspaces: "fuzz"
+
+      - name: Install cargo-fuzz
+        uses: taiki-e/install-action@6c1f7cf125e42770ff087ea443901b487cc5471a # v2
+        with:
+          tool: cargo-fuzz
+
+      # A short smoke run on every push/PR: enough to catch regressions and crashes
+      # quickly without burning CI minutes. Run longer campaigns out of band (the
+      # `just fuzz` recipe, or a scheduled workflow) and commit interesting inputs
+      # to fuzz/corpus to seed future runs.
+      - name: Fuzz (smoke run)
+        run: cargo +nightly fuzz run fuzz_target_1 -- -max_total_time=60 -timeout=10

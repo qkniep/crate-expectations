@@ -1,0 +1,39 @@
+name: no_std
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: no-std-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  no-std:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      # A bare-metal target has no `std` to fall back on, so if the crate builds
+      # here with `--no-default-features` it is genuinely `no_std`-clean. Change
+      # the target to match where you actually deploy.
+      - name: Install toolchain + embedded target
+        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+        with:
+          targets: thumbv7em-none-eabihf
+
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+
+      # A freshly generated project ships no Cargo.lock; create one so the --locked
+      # build below works on the first push. No-op once a lock is committed.
+      - name: Ensure Cargo.lock
+        run: test -f Cargo.lock || cargo generate-lockfile
+
+      - name: Build without std
+        run: cargo build --no-default-features --target thumbv7em-none-eabihf --locked

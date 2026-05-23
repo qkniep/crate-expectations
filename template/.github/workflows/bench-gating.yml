@@ -1,0 +1,40 @@
+name: Benchmarks (CodSpeed)
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: bench-gating-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codspeed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+
+      - name: Install cargo-codspeed
+        uses: taiki-e/install-action@6c1f7cf125e42770ff087ea443901b487cc5471a # v2
+        with:
+          tool: cargo-codspeed
+
+      # CodSpeed runs the criterion benches under instrumentation (deterministic,
+      # CPU-model-independent), so it can gate on perf deltas reliably even on
+      # shared runners — unlike wall-clock timing. Needs a CODSPEED_TOKEN secret.
+      - name: Build benchmarks
+        run: cargo codspeed build
+
+      - name: Run benchmarks
+        uses: CodSpeedHQ/action@76578c2a7ddd928664caa737f0e962e3085d4e7c # v3
+        with:
+          run: cargo codspeed run
+          token: ${{ secrets.CODSPEED_TOKEN }}
