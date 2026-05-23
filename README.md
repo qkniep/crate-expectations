@@ -1,4 +1,4 @@
-# rust-template
+# General Rust Project Template
 
 A [cargo-generate](https://cargo-generate.github.io) template for new Rust
 projects. One source generates any of these, each producing a project whose
