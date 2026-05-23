@@ -78,6 +78,9 @@ jobs:
         env:
           ARGS: ${{ matrix.args }}
         run: |
+          # cargo-generate requires --destination to already exist (it won't
+          # create the parent), so make it first.
+          mkdir -p "$RUNNER_TEMP/gen"
           # shellcheck disable=SC2086  # intentional word-splitting of the arg list
           cargo generate --path ./template --name testproj --silent \
             --destination "$RUNNER_TEMP/gen" $ARGS
@@ -108,7 +111,9 @@ jobs:
       - run: cargo binstall -y cargo-generate
 
       - name: Generate no_std library
-        run: cargo generate --path ./template --name nostdproj --silent --destination "$RUNNER_TEMP/gen" -d kind=library -d no_std=true -d unsafe_policy=deny
+        run: |
+          mkdir -p "$RUNNER_TEMP/gen"
+          cargo generate --path ./template --name nostdproj --silent --destination "$RUNNER_TEMP/gen" -d kind=library -d no_std=true -d unsafe_policy=deny
 
       # Proves the generated no_std crate genuinely builds without std on a
       # bare-metal target — the promise of the no_std archetype. No --locked: a
