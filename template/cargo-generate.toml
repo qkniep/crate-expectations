@@ -57,6 +57,7 @@ fuzzing    = { type = "bool", prompt = "Include a cargo-fuzz target + CI?", defa
 miri       = { type = "bool", prompt = "CI: run tests under Miri (UB detection)?", default = false }
 sanitizers = { type = "bool", prompt = "CI: run tests under Address/Leak/Thread sanitizers?", default = false }
 careful    = { type = "bool", prompt = "CI: run tests under cargo-careful?", default = false }
+feature_powerset = { type = "bool", prompt = "CI: type-check the feature powerset with cargo-hack?", default = false }
 scorecard  = { type = "bool", prompt = "CI: OSSF Scorecard supply-chain analysis?", default = false }
 
 # --- Library-only prompts -------------------------------------------------

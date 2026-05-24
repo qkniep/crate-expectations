@@ -51,6 +51,7 @@ cargo generate --git https://github.com/qkniep/rust-template.git template \
 | `miri` | bool (`false`) | Runs tests under Miri (UB detection) in CI. |
 | `sanitizers` | bool (`false`) | ASan/LeakSan/TSan CI matrix. |
 | `careful` | bool (`false`) | Runs tests under cargo-careful in CI. |
+| `feature_powerset` | bool (`false`) | cargo-hack workflow type-checking every feature combination (mirrors `just hack`). |
 | `scorecard` | bool (`false`) | OSSF Scorecard supply-chain analysis workflow. |
 | `gh_username` | string (`qkniep`) | GitHub owner used in URLs and badges. |
 | `email` | string | Contact for `SECURITY.md` and the code of conduct. |

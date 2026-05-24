@@ -1,0 +1,46 @@
+name: feature-powerset
+
+# Type-checks every combination of Cargo features with cargo-hack, catching items
+# that lack a `#[cfg(feature = "...")]` gate or only build under the --all-features
+# set the core suite uses. Mirrors `just hack`. Only earns its CI minutes once
+# Cargo.toml has two or more optional features — with none, the powerset is a
+# single combination already covered by the core suite (and no-std.yml).
+# See: https://github.com/taiki-e/cargo-hack
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+concurrency:
+  group: feature-powerset-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  powerset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+
+      - name: Install cargo-hack
+        uses: taiki-e/install-action@6c1f7cf125e42770ff087ea443901b487cc5471a # v2
+        with:
+          tool: cargo-hack
+
+      # create lockfile if not committed yet
+      - name: Ensure Cargo.lock
+        run: test -f Cargo.lock || cargo generate-lockfile
+
+      # Identical to `just hack`: every feature combination must type-check across
+      # all targets (lib, bins, tests, benches).
+      - name: Check feature powerset
+        run: cargo hack --feature-powerset --locked check --all-targets
