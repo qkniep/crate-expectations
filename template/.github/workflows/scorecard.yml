@@ -23,10 +23,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      # Needed to upload results to the code-scanning dashboard.
-      security-events: write
-      # Needed for the publish_results provenance attestation.
-      id-token: write
+      contents: read # checkout (overrides workflow-level permissions, so repeat here)
+      security-events: write # Needed to upload results to the code-scanning dashboard.
+      id-token: write # Needed for the publish_results provenance attestation.
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
