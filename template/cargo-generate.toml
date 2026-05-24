@@ -2,7 +2,7 @@
 #
 # Generate a project from this template with:
 #
-#     cargo generate --git https://github.com/qkniep/rust-template.git template
+#     cargo generate qkniep/crate-expectations template
 #
 # `template` is the subfolder; its contents become your new project. The files
 # at the repo root (this template's own self-test CI and docs) are not output.

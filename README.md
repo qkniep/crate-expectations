@@ -1,4 +1,8 @@
-# General Rust Project Template
+<p align="center">
+  <img src="banner.png" alt="Crate Expectations — a delightfully opinionated project bootstrap" width="100%">
+</p>
+
+# Crate Expectations
 
 A [cargo-generate](https://cargo-generate.github.io) template for new Rust
 projects. One source generates one of two archetypes, each producing a project
@@ -17,7 +21,7 @@ set — fuzz a binary, run Miri on an internal lib, and so on.
 
 ```sh
 cargo install cargo-generate          # one-time, if you don't have it
-cargo generate --git https://github.com/qkniep/rust-template.git template
+cargo generate qkniep/crate-expectations template
 ```
 
 `template` is the subfolder that holds the actual project; cargo-generate prompts
@@ -30,7 +34,7 @@ builds in CI are reproducible.
 Scripted / non-interactive (answers passed with `-d`, the rest take defaults):
 
 ```sh
-cargo generate --git https://github.com/qkniep/rust-template.git template \
+cargo generate qkniep/crate-expectations template \
   --name my-app --silent \
   -d kind=binary -d publish=false -d fuzzing=true
 ```
