@@ -1,9 +1,7 @@
 name: Fuzz
 
-# Longer fuzzing run on a weekly schedule. A per-PR 60s smoke is a weak signal and
-# pays the nightly + cargo-fuzz install every time; a longer scheduled run finds
-# more and still catches fuzz-harness build breakage. Switch the cron to daily, or
-# bump -max_total_time below, to fuzz more aggressively.
+# Longer fuzzing run on a weekly schedule.
+# Switch the cron to daily, or bump -max_total_time below, to fuzz more aggressively.
 
 permissions:
   contents: read
