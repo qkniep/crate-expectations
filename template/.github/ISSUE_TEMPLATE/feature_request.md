@@ -6,18 +6,18 @@ labels: "type: feature"
 assignees: ""
 ---
 
-## Problem
+### Problem
 
 <!-- What problem are you trying to solve? What's the use case? -->
 
-## Proposed Solution
+### Proposed Solution
 
 <!-- What you'd like to happen. -->
 
-## Alternatives Considered
+### Alternatives Considered
 
 <!-- Other approaches you've thought about. -->
 
-## Additional Context
+### Additional Context
 
 <!-- Anything else relevant. -->
