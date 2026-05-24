@@ -68,8 +68,20 @@ if !variable::get("miri") {
 if !variable::get("sanitizers") {
     file::delete(".github/workflows/sanitizers.yml");
 }
-if !variable::get("careful") {
+// careful is a 3-way cadence: "off" (no workflow), "weekly" (scheduled sweep on
+// main, the default under unsafe_code = forbid) or "pr" (gate every PR, the
+// default under deny). The two cadences ship as separate whole files because
+// .github isn't Liquid-templated; keep the chosen one and drop the rest.
+let careful = variable::get("careful");
+if careful == "off" {
     file::delete(".github/workflows/careful.yml");
+    file::delete(".github/workflows/careful-pr.yml");
+} else if careful == "pr" {
+    file::delete(".github/workflows/careful.yml");
+    file::rename(".github/workflows/careful-pr.yml", ".github/workflows/careful.yml");
+} else {
+    // "weekly": careful.yml already holds the scheduled variant.
+    file::delete(".github/workflows/careful-pr.yml");
 }
 if !variable::get("feature_powerset") {
     file::delete(".github/workflows/feature-powerset.yml");
