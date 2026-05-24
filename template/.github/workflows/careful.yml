@@ -1,12 +1,8 @@
 name: cargo-careful
 
-# Runs the test suite against a std rebuilt with extra debug assertions to catch
-# UB. See: https://github.com/RalfJung/cargo-careful
-#
-# Scheduled weekly rather than per-PR: it's a UB safety net with no value under the
-# default `unsafe_code = "forbid"`, PRs already run miri + sanitizers for UB, and
-# rebuilding std on nightly is the priciest of the three. Run it from the Actions
-# tab when touching unsafe code.
+# Runs the test suite against a std rebuilt with extra debug assertions to catch UB.
+# Scheduled weekly: has no value under default `unsafe_code = "forbid"`.
+# Run it from the Actions tab when touching unsafe code.
 
 permissions:
   contents: read
