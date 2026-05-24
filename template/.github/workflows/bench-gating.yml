@@ -1,5 +1,9 @@
 name: Benchmarks (CodSpeed)
 
+# CodSpeed runs the criterion benches under instrumentation (deterministic,
+# CPU-model-independent), so it can gate on perf deltas reliably even on
+# shared runners — unlike wall-clock timing. Needs a CODSPEED_TOKEN secret.
+
 permissions:
   contents: read
 
@@ -26,9 +30,6 @@ jobs:
         with:
           tool: cargo-codspeed
 
-      # CodSpeed runs the criterion benches under instrumentation (deterministic,
-      # CPU-model-independent), so it can gate on perf deltas reliably even on
-      # shared runners — unlike wall-clock timing. Needs a CODSPEED_TOKEN secret.
       - name: Build benchmarks
         run: cargo codspeed build
 
