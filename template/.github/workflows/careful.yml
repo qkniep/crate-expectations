@@ -1,6 +1,8 @@
 name: cargo-careful
 
 # Runs the test suite against a std rebuilt with extra debug assertions to catch UB.
+# See: https://github.com/RalfJung/cargo-careful
+#
 # Scheduled weekly: has no value under default `unsafe_code = "forbid"`.
 # Run it from the Actions tab when touching unsafe code.
 
