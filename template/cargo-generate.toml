@@ -1,0 +1,73 @@
+# Template definition for cargo-generate (https://cargo-generate.github.io).
+#
+# Generate a project from this template with:
+#
+#     cargo generate --git https://github.com/qkniep/rust-template.git template
+#
+# `template` is the subfolder; its contents become your new project. The files
+# at the repo root (this template's own self-test CI and docs) are not output.
+# See ../README.md for what every prompt below does.
+
+[template]
+cargo_generate_version = ">=0.21.0"
+
+# Only these paths get Liquid substitution ({{ ... }} / {% ... %}). Everything
+# else — notably .github/ — is copied verbatim, so GitHub Actions' own `${{ ... }}`
+# syntax is never mangled by the templating engine. Capability-specific workflow
+# files are instead added or removed wholesale by pre-script.rhai.
+include = [
+    "Cargo.toml",
+    "src/**",
+    "benches/**",
+    "tests/**",
+    "fuzz/**",
+    "Justfile",
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "SECURITY.md",
+    "LICENSE-MIT",
+]
+
+[hooks]
+# Removes the files an archetype/capability doesn't need (see the script).
+pre = ["pre-script.rhai"]
+
+[placeholders]
+# --- Identity -------------------------------------------------------------
+# `authors` is filled automatically from your git/cargo config (used for the
+# copyright header and Cargo.toml). `email` is the contact for security reports
+# and the code of conduct, which may differ from the commit author.
+gh_username = { type = "string", prompt = "GitHub owner (user or org)", default = "qkniep" }
+email = { type = "string", prompt = "Contact email (security reports, code of conduct)", default = "hello@quentinkniep.com" }
+description = { type = "string", prompt = "One-line crate description", default = "" }
+
+# --- Archetype ------------------------------------------------------------
+kind = { type = "string", prompt = "Project kind", choices = ["library", "binary"], default = "library" }
+unsafe_policy = { type = "string", prompt = "Policy for `unsafe` code", choices = ["forbid", "deny"], default = "forbid" }
+
+# --- Capabilities (orthogonal to archetype — fuzz a binary, Miri a lib, etc.)
+# Each maps to a CI workflow (and sometimes source) that pre-script.rhai removes
+# when the answer is false.
+coverage   = { type = "bool", prompt = "CI: line coverage via cargo-llvm-cov + Codecov?", default = true }
+benchmarks = { type = "bool", prompt = "Include criterion benchmarks?", default = true }
+msrv       = { type = "bool", prompt = "CI: pin & verify a minimum supported Rust version?", default = true }
+fuzzing    = { type = "bool", prompt = "Include a cargo-fuzz target + CI?", default = false }
+miri       = { type = "bool", prompt = "CI: run tests under Miri (UB detection)?", default = false }
+sanitizers = { type = "bool", prompt = "CI: run tests under Address/Leak/Thread sanitizers?", default = false }
+careful    = { type = "bool", prompt = "CI: run tests under cargo-careful?", default = false }
+scorecard  = { type = "bool", prompt = "CI: OSSF Scorecard supply-chain analysis?", default = false }
+
+# --- Library-only prompts -------------------------------------------------
+[conditional.'kind == "library"'.placeholders]
+publish = { type = "bool", prompt = "Publish to crates.io (release-plz + semver checks)?", default = true }
+no_std  = { type = "bool", prompt = "no_std crate (with an optional `std` feature)?", default = false }
+
+# --- Binary-only prompts --------------------------------------------------
+[conditional.'kind == "binary"'.placeholders]
+publish = { type = "bool", prompt = "Publish to crates.io (cargo install)?", default = false }
+
+# --- Benchmark-only prompt ------------------------------------------------
+[conditional.'benchmarks == true'.placeholders]
+bench_gating = { type = "bool", prompt = "CI: gate benchmarks against perf regressions (CodSpeed)?", default = false }

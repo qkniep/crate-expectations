@@ -1,0 +1,81 @@
+[package]
+name = "{{ project-name }}"
+edition = "2024"
+rust-version = "1.90"
+version = "0.1.0"
+authors = ["{{ authors }}"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/{{ gh_username }}/{{ project-name }}"
+description = "{{ description }}"
+{% if publish -%}
+keywords = []   # TODO: up to 5 search terms, e.g. ["cli", "parser"]
+categories = [] # TODO: slugs from https://crates.io/category_slugs
+
+# Keep the published tarball lean with an allowlist: ship only the source and the
+# docs consumers see. Any new top-level dev/CI file is then excluded by default,
+# so no one has to remember to denylist it. `Cargo.toml` is always included; the
+# LICENSE files must be listed explicitly because `license` is an SPDX expression
+# rather than `license-file`. Verify with `cargo package --list`.
+include = [
+    "src/**/*",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE-*",
+]
+{% else -%}
+publish = false
+{% endif %}
+{% if no_std -%}
+[features]
+# `std` is on by default; build with `--no-default-features` for `no_std` targets.
+# Gate std-only items with `#[cfg(feature = "std")]` and pull in `alloc` directly
+# (see src/lib.rs) when you need heap types without `std`.
+default = ["std"]
+std = []
+{% else -%}
+# Optional features go here. Gate the corresponding item with
+# `#[cfg(feature = "...")]` and annotate it with
+# `#[cfg_attr(docsrs, doc(cfg(feature = "...")))]` so docs.rs shows a feature
+# badge (see src/lib.rs). docs.rs builds with `all-features = true` below.
+# [features]
+# default = []
+# foo = []
+{% endif %}
+[dependencies]
+
+[dev-dependencies]
+{% if benchmarks -%}
+{%- if bench_gating %}
+# CodSpeed's drop-in Criterion replacement, aliased to `criterion` so the bench
+# code is byte-identical to upstream. Its `4.x` is this shim's own version line
+# (real `criterion` is at `0.8`); outside CodSpeed's instrumented CI it behaves
+# exactly like Criterion, so `just bench` still works locally.
+criterion = { package = "codspeed-criterion-compat", version = "4", features = ["html_reports"] }
+{%- else %}
+criterion = { version = "0.8", features = ["html_reports"] }
+{%- endif %}
+
+[[bench]]
+name = "bench"
+harness = false
+{% endif %}
+[lints.rust]
+unsafe_code = "{{ unsafe_policy }}"
+unreachable_pub = "warn"
+missing_debug_implementations = "warn"
+{%- if kind == "library" %}
+# `missing_docs` lives in `src/lib.rs` (#![warn(missing_docs)]) so it applies to
+# the library API only, not the test/bench crates.
+{%- endif %}
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+# Opt in to stricter linting by uncommenting:
+# pedantic = { level = "warn", priority = -1 }
+{% if publish %}
+# Build docs the way docs.rs does: all features, with `--cfg docsrs` so you can
+# gate feature-specific docs behind `#[cfg_attr(docsrs, doc(cfg(...)))]`.
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+{% endif -%}

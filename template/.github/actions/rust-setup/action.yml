@@ -1,0 +1,36 @@
+name: "Rust setup"
+description: "Installs Rust toolchain, tools, and configures caching"
+
+inputs:
+  toolchain:
+    required: false
+    default: stable
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+      with:
+        toolchain: ${{ inputs.toolchain }}
+        components: rustfmt, clippy
+
+    - name: Install cargo tools
+      uses: taiki-e/install-action@6c1f7cf125e42770ff087ea443901b487cc5471a # v2
+      with:
+        tool: nextest,cargo-deny,cargo-machete
+
+    - name: Rust cache
+      uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+      with:
+        cache-all-crates: true
+
+    # generate lockfile if not committed yet
+    - name: Ensure Cargo.lock
+      shell: bash
+      run: test -f Cargo.lock || cargo generate-lockfile
+
+    - name: Set env
+      shell: bash
+      run: |
+        echo "CARGO_TERM_COLOR=always" >> $GITHUB_ENV

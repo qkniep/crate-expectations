@@ -1,0 +1,134 @@
+# Test threads for nextest. Override with `just jobs=8 test` or JOBS=8.
+jobs := env_var_or_default("JOBS", "16")
+
+# List available recipes.
+default:
+    @just --list
+
+# `just` itself isn't here — bootstrap it with `cargo install just`.
+# Install the dev tools `just check` (and the optional recipes) need.
+setup:
+    rustup toolchain install nightly --component rustfmt{% if miri %},miri{% endif %}
+    cargo install --locked cargo-nextest cargo-deny cargo-machete typos-cli{% if coverage %} cargo-llvm-cov{% endif %}{% if careful %} cargo-careful{% endif %}{% if fuzzing %} cargo-fuzz{% endif %}
+
+# Full local check suite (mirrors the core CI).
+check: _check-tools fmt clippy build test doc deny machete typos{% if benchmarks %} bench-build{% endif %}
+
+# Check formatting (nightly rustfmt).
+fmt:
+    cargo +nightly fmt --all -- --check
+
+# Lint with clippy, denying warnings.
+clippy:
+    cargo clippy --all-targets --all-features -- -D warnings
+
+# Build all targets in release mode.
+build: _lockfile
+    cargo build --release --all-targets --locked
+
+# Run unit, integration, and doc tests.
+test: _lockfile
+    cargo nextest run --all-targets --all-features --locked --test-threads={% raw %}{{jobs}}{% endraw %}
+    cargo test --doc --all-features --locked
+
+# Build the documentation, denying warnings (mirrors CI and docs.rs).
+doc: _lockfile
+    RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features --document-private-items --locked
+
+# Check the dependency tree (advisories, licenses, bans, sources).
+deny:
+    cargo deny check
+
+# Find unused dependencies.
+machete:
+    cargo machete
+
+# Check spelling.
+typos:
+    typos
+
+# Lint the GitHub Actions workflows (also enforced by the actionlint CI job).
+actionlint:
+    actionlint
+
+# Revert every SHA-pinned action (@<sha> # vX) to its mutable tag (@vX).
+# Actions ship SHA-pinned for supply-chain safety; run this once if you'd rather
+# track tags. The new ref is read from the `# vX` comment, so dtolnay toolchains
+# correctly revert to @stable/@nightly/@master. Dependabot updates either form.
+unpin:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    find .github -type f \( -name '*.yml' -o -name '*.yaml' \) -print0 \
+        | xargs -0 perl -i -pe 's/uses:(\s*)([^@\s]+)@[0-9a-fA-F]{40}\s+#\s+(\S+)/uses:$1$2\@$3/g'
+    echo "Unpinned all actions to tag refs. Review with: git diff .github"
+{% if benchmarks %}
+# Compile-check benchmarks — what `just check` runs (CI never runs benches).
+bench-build: _lockfile
+    cargo bench --no-run --locked
+
+# Run benchmarks (criterion). For local profiling only — not part of `just check`.
+bench:
+    cargo bench
+{% endif -%}
+{%- if coverage %}
+# Generate an HTML coverage report and open it.
+coverage:
+    cargo llvm-cov --all-features --open nextest
+{% endif -%}
+{%- if miri %}
+# Run tests under Miri to catch undefined behavior (slow; not in `just check`).
+miri:
+    cargo +nightly miri nextest run --all-features
+{% endif -%}
+{%- if careful %}
+# Run tests under cargo-careful for extra runtime UB checks (nightly).
+careful:
+    cargo +nightly careful test --all-features
+{% endif -%}
+{%- if sanitizers %}
+# sanitizers.yml runs the full address/leak/thread matrix on Linux; this is
+# narrower on purpose, since LeakSanitizer is unsupported on macOS and TSan is
+# flaky there, while ASan works everywhere. (just shows the last line below in
+# `just --list`, so keep it a standalone summary.)
+# Quick local AddressSanitizer smoke check on the host target.
+sanitize:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    target=$(rustc -vV | sed -n 's|host: ||p')
+    RUSTFLAGS="-Zsanitizer=address" RUSTDOCFLAGS="-Zsanitizer=address" \
+        cargo +nightly test -Zbuild-std --all-features --target "$target"
+{% endif -%}
+{%- if fuzzing %}
+# Run the fuzz target for 60s (requires cargo-fuzz + nightly).
+fuzz:
+    cargo +nightly fuzz run fuzz_target_1 -- -max_total_time=60
+{% endif %}
+# List unfinished work: todo!/unimplemented! macros and TODO-style comments.
+todo:
+    -rg 'todo!\(\)|unimplemented!\(\)' --iglob='!Justfile'
+    -rg 'TODO|XXX|HACK|PERF|FIXME|BUG' --iglob='!Justfile'
+
+# Ensure a Cargo.lock exists before the `--locked` recipes run (hidden helper).
+# cargo-generate ships no lock, so a fresh checkout has none until the first
+# build; without this, `just build`/`test`/`doc`/`bench-build` would fail on a
+# clean tree. A no-op once a lock is committed, so `--locked`'s drift detection
+# stays intact. `just` runs a shared dependency only once, so `just check`
+# triggers this a single time.
+_lockfile:
+    [ -f Cargo.lock ] || cargo generate-lockfile
+
+# Report any tools `just check` needs that aren't installed (hidden helper).
+_check-tools:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    missing=()
+    command -v cargo-nextest >/dev/null 2>&1 || missing+=("cargo-nextest")
+    command -v cargo-deny    >/dev/null 2>&1 || missing+=("cargo-deny")
+    command -v cargo-machete >/dev/null 2>&1 || missing+=("cargo-machete")
+    command -v typos         >/dev/null 2>&1 || missing+=("typos-cli")
+    cargo +nightly fmt --version >/dev/null 2>&1 || missing+=("nightly rustfmt")
+    if [ ${#missing[@]} -ne 0 ]; then
+        echo "Missing tools: ${missing[*]}" >&2
+        echo "Run \`just setup\` to install them." >&2
+        exit 1
+    fi
