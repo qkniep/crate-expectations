@@ -58,18 +58,17 @@ jobs:
         run: cargo test --doc --all-features --locked
 
   build:
+    # Debug compilation (all taargets) is already covered by `test`, so this job
+    # only does the release build.
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        mode: [debug, release]
     timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/rust-setup
 
-      - name: Build (${{ matrix.mode }})
-        run: cargo build --all-targets ${{ matrix.mode == 'release' && '--release' || '' }} --locked
+      - name: Build (release)
+        run: cargo build --all-targets --release --locked
 
   security:
     runs-on: ubuntu-latest
