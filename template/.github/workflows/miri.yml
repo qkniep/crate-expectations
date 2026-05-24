@@ -1,5 +1,8 @@
 name: Miri
 
+# Miri detects unsafe code that fails to uphold its safety requirements.
+# See: https://github.com/rust-lang/miri
+
 permissions:
   contents: read
 
@@ -27,7 +30,6 @@ jobs:
         with:
           components: miri
 
-      # nextest to match `just miri` (and the rest of the template's test runner).
       - name: Install nextest
         uses: taiki-e/install-action@6c1f7cf125e42770ff087ea443901b487cc5471a # v2
         with:
