@@ -49,6 +49,8 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/rust-setup
+        with:
+          tools: nextest
 
       - name: Tests
         run: cargo nextest run --all-targets --all-features --locked
@@ -76,6 +78,8 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/rust-setup
+        with:
+          tools: cargo-deny,cargo-machete
 
       - name: Cargo deny (advisories, licenses, bans, sources)
         run: cargo deny check
