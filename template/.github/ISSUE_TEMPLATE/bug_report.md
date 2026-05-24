@@ -6,26 +6,26 @@ labels: "type: bug"
 assignees: ""
 ---
 
-## Description
+### Description
 
 <!-- A clear description of the bug. -->
 
-## Steps to Reproduce
+### Steps to Reproduce
 
 1.
 2.
 3.
 
-## Expected Behavior
+### Expected Behavior
 
 <!-- What you expected to happen. -->
 
-## Environment
+### Environment
 
 - Crate version:
 - Rust version (`rustc --version`):
 - OS:
 
-## Additional Context
+### Additional Context
 
 <!-- Logs, backtraces, or a minimal reproduction if available. -->

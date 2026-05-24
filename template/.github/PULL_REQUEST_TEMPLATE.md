@@ -1,14 +1,14 @@
 <!-- Describe what this PR changes and why. -->
 
-## Summary
+### Summary
 
-## Changes Made
+### Changes Made
 
-## Related issues
+### Related issues
 
 <!-- e.g. "Closes #123" -->
 
-## Checklist
+### Checklist
 
 - [ ] `just check` passes locally
 - [ ] Tests added or updated
