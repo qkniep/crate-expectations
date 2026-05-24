@@ -26,11 +26,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # Use actions-rust-lang/setup-rust-toolchain (not dtolnay/rust-toolchain): it is
-    # semver-tagged and selects the channel via the `toolchain` input, so SHA-pinning
-    # + Dependabot can't silently swap stable<->nightly (dtolnay encodes the channel
-    # in the branch ref, which a SHA pin discards). It wraps Swatinem/rust-cache, so
-    # caching is configured here rather than as a separate step.
     - name: Install Rust toolchain
       uses: actions-rust-lang/setup-rust-toolchain@46268bd060767258de96ed93c1251119784f2ab6 # v1
       with:
