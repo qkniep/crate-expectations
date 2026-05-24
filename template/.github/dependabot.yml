@@ -33,7 +33,7 @@ updates:
     labels:
       - "type: dependencies"
     groups:
+      # Actions are SHA-pinned, so simply group all, regardless of SemVer.
       github-actions:
-        update-types:
-          - "minor"
-          - "patch"
+        patterns:
+          - "*"
