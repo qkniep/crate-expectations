@@ -33,6 +33,10 @@ jobs:
             args: "-d kind=library -d publish=false"
           - name: application
             args: "-d kind=binary -d publish=false"
+          # Exercises the binary publish path: release-dist.yml plus the App-token
+          # release-plz variant (release-plz-app.yml), both linted by actionlint.
+          - name: published-application
+            args: "-d kind=binary -d publish=true"
           # The kitchen sink: no_std, unsafe allowed-but-denied, every hardening
           # capability on. `just check` runs the core suite; the capability
           # workflows (miri, sanitizers, ...) are validated by actionlint below.

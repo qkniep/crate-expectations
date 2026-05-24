@@ -27,10 +27,21 @@ if is_lib {
 // published library's public API. Neither applies to unpublished crates, and
 // semver checks are library-only. The PR-title lint only matters because
 // release-plz reads squash-merged PR titles, so it's gated the same way.
+//
+// Two release-plz workflows ship and exactly one survives, chosen by archetype:
+// a library drives release-plz with the built-in GITHUB_TOKEN (release-plz.yml),
+// but a binary needs a GitHub App token (release-plz-app.yml) so the release tag
+// can fire release-dist.yml — the default token can't trigger other workflows.
 if !publish {
     file::delete(".github/workflows/release-plz.yml");
+    file::delete(".github/workflows/release-plz-app.yml");
     file::delete("release-plz.toml");
     file::delete(".github/workflows/pr-title.yml");
+} else if is_lib {
+    file::delete(".github/workflows/release-plz-app.yml");
+} else {
+    file::delete(".github/workflows/release-plz.yml");
+    file::rename(".github/workflows/release-plz-app.yml", ".github/workflows/release-plz.yml");
 }
 if !(is_lib && publish) {
     file::delete(".github/workflows/semver.yml");
