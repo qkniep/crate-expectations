@@ -1,5 +1,5 @@
 name: "Rust setup"
-description: "Installs a Rust toolchain, components, targets, and tools, and configures caching"
+description: "Installs a Rust toolchain with specified components, targets, and tools, and configures caching."
 
 inputs:
   toolchain:
@@ -7,7 +7,7 @@ inputs:
     required: false
     default: stable
   components:
-    description: "Comma-separated rustup components (e.g. rust-src, miri). Empty installs none."
+    description: "Comma-separated rustup components (e.g. rust-src, miri). Empty installs rustfmt and clippy."
     required: false
     default: "rustfmt, clippy"
   targets:
