@@ -53,8 +53,7 @@ actionlint:
 
 # Revert every SHA-pinned action (@<sha> # vX) to its mutable tag (@vX).
 # Actions ship SHA-pinned for supply-chain safety; run this once if you'd rather
-# track tags. The new ref is read from the `# vX` comment, so dtolnay toolchains
-# correctly revert to @stable/@nightly/@master. Dependabot updates either form.
+# track tags. The new ref is read from the `# vX` comment. Dependabot updates either form.
 unpin:
     #!/usr/bin/env bash
     set -euo pipefail
