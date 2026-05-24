@@ -63,8 +63,9 @@ your git/cargo config automatically.
 
 The always-on core: `cargo fmt` (nightly) · clippy (`-D warnings`) · nextest +
 doctests · debug/release builds · `cargo deny` · `cargo machete` · `cargo doc`
-(`-D warnings`) · typos · actionlint · a `just` task runner whose `just check`
-mirrors CI · Dependabot · a synced label set · scheduled RUSTSEC audits ·
+(`-D warnings`) · typos · actionlint · SHA-pinned actions (`just unpin` to track
+tags instead) · a `just` task runner whose `just check` mirrors CI · Dependabot ·
+a synced label set · scheduled RUSTSEC audits ·
 issue/PR templates · `SECURITY.md`, `CONTRIBUTING.md`, code of conduct, and
 dual MIT/Apache-2.0 licensing.
 
