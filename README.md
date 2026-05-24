@@ -29,11 +29,11 @@ set — fuzz a binary, run Miri on an internal lib, and so on.
 
 ```sh
 cargo install cargo-generate          # one-time, if you don't have it
-cargo generate qkniep/crate-expectations template
+cargo generate qkniep/crate-expectations
 ```
 
-`template` is the subfolder that holds the actual project; cargo-generate prompts
-for the options below and writes a ready-to-go project into a new directory.
+cargo-generate prompts for a project name and the options below, then writes a
+ready-to-go project into a new directory of that name.
 
 Run `just check` in the new project before your first push: it generates
 `Cargo.lock` (cargo-generate doesn't), which you should commit so the `--locked`
@@ -42,7 +42,7 @@ builds in CI are reproducible.
 Scripted / non-interactive (answers passed with `-d`, the rest take defaults):
 
 ```sh
-cargo generate qkniep/crate-expectations template \
+cargo generate qkniep/crate-expectations \
   --name my-app --silent \
   -d kind=binary -d publish=false -d fuzzing=true
 ```

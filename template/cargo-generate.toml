@@ -2,10 +2,11 @@
 #
 # Generate a project from this template with:
 #
-#     cargo generate qkniep/crate-expectations template
+#     cargo generate qkniep/crate-expectations
 #
-# `template` is the subfolder; its contents become your new project. The files
-# at the repo root (this template's own self-test CI and docs) are not output.
+# cargo-generate auto-discovers this template in the `template/` subfolder; its
+# contents become your new project. The files at the repo root (this template's
+# own self-test CI and docs) are not output.
 # See ../README.md for what every prompt below does.
 
 [template]
