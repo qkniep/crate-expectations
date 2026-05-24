@@ -13,6 +13,7 @@ Scorecard, …) are **independent toggles** you mix with either archetype, so a
 `no_std` / security-critical library is just a library with the right toggles
 set — fuzz a binary, run Miri on an internal lib, and so on.
 
+> [!NOTE]
 > **Heads-up — this is my personal template.** Its defaults encode my own
 > preferences, and the identity prompts default to my GitHub owner (`qkniep`)
 > and contact email. Generating from it directly is fine — just set
