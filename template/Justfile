@@ -104,6 +104,9 @@ fuzz:
     cargo +nightly fuzz run fuzz_target_1 -- -max_total_time=60
 {% endif -%}
 {%- if feature_powerset %}
+# For a library, swap `--all-targets` for `--no-dev-deps` to catch missing
+# `#[cfg(feature)]` gates that dev-deps would otherwise mask; it can't run under
+# `--locked`, but cargo-hack restores Cargo.lock when done so the tree stays clean.
 # Type-check every feature combination with cargo-hack (mirrors feature-powerset CI).
 hack: _lockfile
     cargo hack --feature-powerset --locked check --all-targets

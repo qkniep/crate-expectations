@@ -1,10 +1,18 @@
 name: feature-powerset
 
-# Type-checks every combination of Cargo features with cargo-hack, catching items
-# that lack a `#[cfg(feature = "...")]` gate or only build under the --all-features
-# set the core suite uses. Mirrors `just hack`. Only earns its CI minutes once
-# Cargo.toml has two or more optional features — with none, the powerset is a
-# single combination already covered by the core suite (and no-std.yml).
+# Type-checks every combination of Cargo features with cargo-hack, across all
+# targets (lib, bins, tests, benches), catching code that only compiles under the
+# --all-features set the core suite uses. Mirrors `just hack`. Only earns its CI
+# minutes once Cargo.toml has two or more optional features — with none, the
+# powerset is a single combination already covered by the core suite (and
+# no-std.yml).
+#
+# --all-targets keeps dev-deps in the graph, so a missing `#[cfg(feature = "...")]`
+# gate can hide when a dev-dependency pulls the optional dep in anyway. For a
+# library where that matters, swap `--all-targets` for `--no-dev-deps`, which
+# checks the public feature surface in isolation. It can't run under `--locked`
+# (cargo-hack edits the manifest, which a locked build forbids) but restores
+# Cargo.lock when done, so the working tree stays clean.
 # See: https://github.com/taiki-e/cargo-hack
 
 permissions:
