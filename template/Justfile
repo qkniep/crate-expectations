@@ -9,7 +9,7 @@ default:
 # Install the dev tools `just check` (and the optional recipes) need.
 setup:
     rustup toolchain install nightly --component rustfmt{% if miri %},miri{% endif %}
-    cargo install --locked cargo-nextest cargo-deny cargo-machete typos-cli{% if coverage %} cargo-llvm-cov{% endif %}{% if careful %} cargo-careful{% endif %}{% if fuzzing %} cargo-fuzz{% endif %}
+    cargo install --locked cargo-nextest cargo-deny cargo-machete typos-cli{% if coverage %} cargo-llvm-cov{% endif %}{% if careful %} cargo-careful{% endif %}{% if fuzzing %} cargo-fuzz{% endif %}{% if feature_powerset %} cargo-hack{% endif %}
 
 # Full local check suite (mirrors the core CI).
 check: _check-tools fmt clippy build test doc deny machete typos{% if benchmarks %} bench-build{% endif %}
@@ -102,6 +102,11 @@ sanitize:
 # Run the fuzz target for 60s (requires cargo-fuzz + nightly).
 fuzz:
     cargo +nightly fuzz run fuzz_target_1 -- -max_total_time=60
+{% endif -%}
+{%- if feature_powerset %}
+# Type-check every feature combination with cargo-hack (mirrors feature-powerset CI).
+hack: _lockfile
+    cargo hack --feature-powerset --locked check --all-targets
 {% endif %}
 # List unfinished work: todo!/unimplemented! macros and TODO-style comments.
 todo:
@@ -129,6 +134,6 @@ _check-tools:
     cargo +nightly fmt --version >/dev/null 2>&1 || missing+=("nightly rustfmt")
     if [ ${#missing[@]} -ne 0 ]; then
         echo "Missing tools: ${missing[*]}" >&2
-        echo "Run \`just setup\` to install them." >&2
+        echo "Run \`just setup\` to install all (or install them manually)." >&2
         exit 1
     fi

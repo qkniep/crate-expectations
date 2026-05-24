@@ -71,6 +71,9 @@ if !variable::get("sanitizers") {
 if !variable::get("careful") {
     file::delete(".github/workflows/careful.yml");
 }
+if !variable::get("feature_powerset") {
+    file::delete(".github/workflows/feature-powerset.yml");
+}
 if !variable::get("scorecard") {
     file::delete(".github/workflows/scorecard.yml");
 }
