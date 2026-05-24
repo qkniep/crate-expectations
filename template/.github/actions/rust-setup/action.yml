@@ -5,6 +5,10 @@ inputs:
   toolchain:
     required: false
     default: stable
+  tools:
+    description: "Comma-separated cargo tools to install via taiki-e/install-action (e.g. nextest, cargo-deny). Empty installs none."
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -16,9 +20,10 @@ runs:
         components: rustfmt, clippy
 
     - name: Install cargo tools
+      if: inputs.tools != ''
       uses: taiki-e/install-action@6c1f7cf125e42770ff087ea443901b487cc5471a # v2
       with:
-        tool: nextest,cargo-deny,cargo-machete
+        tool: ${{ inputs.tools }}
 
     - name: Rust cache
       uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
