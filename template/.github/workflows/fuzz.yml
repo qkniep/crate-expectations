@@ -1,14 +1,17 @@
 name: Fuzz
 
-# Short smoke runs on every push/PR to catch regressions and crashes quickly.
+# Longer fuzzing run on a weekly schedule.
+# Switch the cron to daily, or bump -max_total_time below, to fuzz more aggressively.
 
 permissions:
   contents: read
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
+  schedule:
+    # Mondays at 06:00 UTC. Note: scheduled runs only fire on the default branch.
+    - cron: "0 6 * * 1"
+  # Allow manual runs from the Actions tab.
+  workflow_dispatch:
 
 concurrency:
   group: fuzz-${{ github.ref }}
@@ -17,7 +20,9 @@ concurrency:
 jobs:
   fuzz:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Headroom over -max_total_time=1800 (30m) for checkout, nightly + cargo-fuzz
+    # install, and building the target. Bump both together if you raise the budget.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
@@ -33,5 +38,5 @@ jobs:
         with:
           tool: cargo-fuzz
 
-      - name: Fuzz (smoke run)
-        run: cargo +nightly fuzz run fuzz_target_1 -- -max_total_time=60 -timeout=10
+      - name: Fuzz
+        run: cargo +nightly fuzz run fuzz_target_1 -- -max_total_time=1800 -timeout=10

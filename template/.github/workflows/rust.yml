@@ -60,8 +60,10 @@ jobs:
         run: cargo test --doc --all-features --locked
 
   build:
-    # Debug compilation (all taargets) is already covered by `test`, so this job
-    # only does the release build.
+    # Release-only: debug compilation of all targets is already covered by `test`,
+    # and release-only breakage is rare, so this runs on main pushes rather than
+    # every PR. `push` only fires on main (see triggers above).
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
