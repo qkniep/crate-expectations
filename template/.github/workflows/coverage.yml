@@ -1,5 +1,7 @@
 name: Coverage
 
+# Performs test coverage analysis, uploads results to Codecov.
+
 permissions:
   contents: read
 
