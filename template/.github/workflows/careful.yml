@@ -3,11 +3,8 @@ name: cargo-careful
 # Runs the test suite against a std rebuilt with extra debug assertions to catch UB.
 # See: https://github.com/RalfJung/cargo-careful
 #
-# Weekly cadence: the default under `unsafe_code = "forbid"`, where your own code
-# has no unsafe and the only UB careful can surface reaches you through
-# dependencies. A scheduled run only fires on the default branch, so this is a
-# periodic sweep, not a PR gate. Crates that allow unsafe (`deny`) get the per-PR
-# variant instead.
+# Scheduled weekly: has little value under default `unsafe_code = "forbid"`.
+# Run it from the Actions tab when touching unsafe code.
 #
 # NOTE: keep the job below in sync with careful-pr.yml — the two files differ
 # only in their `on:` triggers, and pre-script.rhai installs exactly one.
