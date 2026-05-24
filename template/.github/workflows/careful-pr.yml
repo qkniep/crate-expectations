@@ -4,8 +4,7 @@ name: cargo-careful
 # See: https://github.com/RalfJung/cargo-careful
 #
 # Per-PR cadence: the default under `unsafe_code = "deny"`, where unsafe can be
-# introduced in any PR, so careful gates every PR before merge. Crates that
-# forbid unsafe get the weekly sweep variant instead.
+# introduced in any PR, so careful gates every PR before merge.
 #
 # NOTE: keep the job below in sync with careful.yml — the two files differ only
 # in their `on:` triggers, and pre-script.rhai installs exactly one.
