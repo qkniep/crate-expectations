@@ -1,7 +1,9 @@
 name: SemVer
 
-# Checks that the crate's public API is SemVer-compliant.
-# This job is a no-op until the first version is published to crates.io.
+# Checks that the crate's public API is SemVer-compliant by diffing it against
+# the latest release on crates.io. That baseline only exists once a version has
+# been published, so the check below is gated on the crate actually existing on
+# crates.io — until your first release it exits in seconds instead of building.
 
 permissions:
   contents: read
@@ -22,5 +24,22 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
+      # cargo-semver-checks needs a published baseline to diff against; with
+      # nothing on crates.io yet it has nothing to do but still compiles the
+      # crate's rustdoc. Look the crate up first and skip the check until that
+      # first version exists (both cargo and jq are preinstalled on the runner).
+      - name: Check whether the crate is published
+        id: published
+        run: |
+          name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].name')
+          if curl -sf -A "semver-checks gate (github actions)" \
+              "https://crates.io/api/v1/crates/$name" -o /dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::$name is not published on crates.io yet; skipping SemVer check until the first release."
+          fi
+
       - name: Check SemVer
+        if: steps.published.outputs.exists == 'true'
         uses: obi1kenobi/cargo-semver-checks-action@6b69fcf40e9b5fb17adeb57e4b6ecd020649a239 # v2
