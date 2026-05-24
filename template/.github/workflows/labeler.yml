@@ -1,7 +1,8 @@
 name: Labeler
 
 # Syncs the repo's labels to .github/labels.yml so the label set is declarative
-# and version-controlled. Runs when that file changes (and on demand).
+# and version-controlled. Pushes to main apply the set; PRs that touch the file
+# get a dry-run preview in the job logs.
 
 permissions:
   contents: read
@@ -9,6 +10,8 @@ permissions:
 on:
   push:
     branches: ["main"]
+    paths: [".github/labels.yml"]
+  pull_request:
     paths: [".github/labels.yml"]
   workflow_dispatch:
 
@@ -25,6 +28,7 @@ jobs:
         uses: crazy-max/ghaction-github-labeler@548a7c3603594ec17c819e1239f281a3b801ab4d # v6
         with:
           yaml-file: .github/labels.yml
-          # Previews changes without applying. Flip to false once you're happy
-          # with the set above, or to let it prune labels not listed here.
-          dry-run: true
+          # PRs preview changes in the logs without applying; pushes to main
+          # apply the set, deleting any labels not listed above.
+          dry-run: ${{ github.event_name == 'pull_request' }}
+          # Set "skip-delete: true" to sync add-only, without pruning.
