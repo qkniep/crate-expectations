@@ -17,6 +17,14 @@ Scorecard, …) are **independent toggles** you mix with either archetype, so a
 `no_std` / security-critical library is just a library with the right toggles
 set — fuzz a binary, run Miri on an internal lib, and so on.
 
+> [!NOTE]
+> **Heads-up — this is my personal template.** Its defaults encode my own
+> preferences, and the identity prompts default to my GitHub owner (`qkniep`)
+> and contact email. Generating from it directly is fine — just set
+> `gh_username` / `email` when prompted (especially under `--silent`, which
+> takes the defaults without asking). If you want it as your own long-term
+> baseline, **fork it** and adjust the defaults in `cargo-generate.toml`.
+
 ## Quick start
 
 ```sh
@@ -54,7 +62,7 @@ cargo generate qkniep/crate-expectations template \
 | `fuzzing` | bool (`false`) | cargo-fuzz target scaffold + a CI smoke run. |
 | `miri` | bool (`false`) | Runs tests under Miri (UB detection) in CI. |
 | `sanitizers` | bool (`false`) | ASan/LeakSan/TSan CI matrix. |
-| `careful` | bool (`false`) | Runs tests under cargo-careful in CI. |
+| `careful` | `off` \| `weekly` \| `pr` (tracks `unsafe_policy`: `deny`→`pr`, `forbid`→`weekly`) | Runs tests under cargo-careful in CI. `pr` gates every PR; `weekly` is a scheduled sweep on `main`; `off` disables it. |
 | `feature_powerset` | bool (`false`) | cargo-hack workflow type-checking every feature combination (mirrors `just hack`). |
 | `scorecard` | bool (`false`) | OSSF Scorecard supply-chain analysis workflow (adds a badge when `publish` is also set). |
 | `gh_username` | string (`qkniep`) | GitHub owner used in URLs and badges. |
