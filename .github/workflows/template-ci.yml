@@ -62,7 +62,11 @@ jobs:
 
       - name: Install cargo-generate
         uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
-      - run: cargo binstall -y cargo-generate
+      # --force: rust-cache can restore cargo's install ledger
+      # (.crates2.json) without the matching ~/.cargo/bin binary, after which a
+      # plain `binstall` sees "already installed" and skips, leaving no
+      # cargo-generate. --force reinstalls regardless of the ledger.
+      - run: cargo binstall -y --force cargo-generate
 
       - name: Install actionlint
         env:
@@ -108,7 +112,11 @@ jobs:
 
       - name: Install cargo-generate
         uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
-      - run: cargo binstall -y cargo-generate
+      # --force: rust-cache can restore cargo's install ledger
+      # (.crates2.json) without the matching ~/.cargo/bin binary, after which a
+      # plain `binstall` sees "already installed" and skips, leaving no
+      # cargo-generate. --force reinstalls regardless of the ledger.
+      - run: cargo binstall -y --force cargo-generate
 
       - name: Generate no_std library
         run: |
