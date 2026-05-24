@@ -7,19 +7,19 @@
 #     push to main never publishes — merging the release PR is your deliberate
 #     "publish now" signal, and the first version (0.1.0) is gated like any other.
 #
-# This binary archetype uses a GitHub App token rather than the built-in
-# GITHUB_TOKEN because the default token cannot trigger other workflows: a release
-# tag it creates would never fire release-dist.yml, so no cross-platform binaries
-# would be built. The App token also runs CI on the release PR and needs no repo
-# settings flipped. (A library has no release-dist.yml, so it ships the simpler
-# GITHUB_TOKEN variant of this workflow instead.)
+# This workflow uses a GitHub App token instead of the built-in GITHUB_TOKEN,
+# which can't trigger other workflows: a release tag created with it would never
+# fire release-dist.yml, so no cross-platform binaries would be built. The App
+# token fires that workflow, also runs CI on the release PR, and needs no repo
+# settings flipped.
 #
-# Setup required:
+# Setup:
 #   1. Create a GitHub App (Settings > Developer settings > GitHub Apps) with
-#      repository permissions Contents: Read & write and Pull requests: Read &
-#      write. Install it on this repo and generate a private key.
-#   2. Add repository secrets APP_ID (the App's ID) and APP_PRIVATE_KEY (the
-#      private key contents), plus CARGO_REGISTRY_TOKEN (a crates.io API token).
+#      repository permissions Contents and Pull requests both Read & write.
+#      Install it on this repo and generate a private key.
+#   2. Add repository secrets APP_ID, APP_PRIVATE_KEY (the private key contents),
+#      and CARGO_REGISTRY_TOKEN (a crates.io API token).
+# See https://release-plz.dev/docs/github/token for token options.
 name: Release-plz
 
 permissions:
