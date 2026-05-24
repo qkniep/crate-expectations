@@ -19,11 +19,9 @@ concurrency:
 # sanitizers.yml, careful.yml, scorecard.yml, no-std.yml) so a project can drop
 # one by deleting a single file.
 jobs:
-  # Cheap checks grouped onto one runner so they share a single boot + checkout
-  # instead of paying that overhead three times over. fmt needs nightly rustfmt;
-  # typos and actionlint need no toolchain. `if: ${{ !cancelled() }}` lets every
-  # check still run after an earlier one fails, so a single run reports all
-  # problems — the behavior we'd otherwise lose by collapsing separate jobs.
+  # Cheap checks grouped onto one runner so they share a single boot + checkout.
+  # Need nightly with rustfmt for fmt; typos and actionlint need no toolchain.
+  # Reports failure only after each step ran (`if: ${{ !cancelled() }}`).
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 5
