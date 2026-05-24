@@ -2,22 +2,22 @@
 name: Feature request
 about: Suggest an idea or enhancement
 title: ""
-labels: enhancement
+labels: "type: feature"
 assignees: ""
 ---
 
 ## Problem
 
-What problem are you trying to solve? What's the use case?
+<!-- What problem are you trying to solve? What's the use case? -->
 
-## Proposed solution
+## Proposed Solution
 
-What you'd like to happen.
+<!-- What you'd like to happen. -->
 
-## Alternatives considered
+## Alternatives Considered
 
-Other approaches you've thought about.
+<!-- Other approaches you've thought about. -->
 
-## Additional context
+## Additional Context
 
-Anything else relevant.
+<!-- Anything else relevant. -->

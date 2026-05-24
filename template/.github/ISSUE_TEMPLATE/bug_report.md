@@ -2,23 +2,23 @@
 name: Bug report
 about: Report something that isn't working as expected
 title: ""
-labels: bug
+labels: "type: bug"
 assignees: ""
 ---
 
 ## Description
 
-A clear description of the bug.
+<!-- A clear description of the bug. -->
 
-## Steps to reproduce
+## Steps to Reproduce
 
 1.
 2.
 3.
 
-## Expected behavior
+## Expected Behavior
 
-What you expected to happen.
+<!-- What you expected to happen. -->
 
 ## Environment
 
@@ -26,6 +26,6 @@ What you expected to happen.
 - Rust version (`rustc --version`):
 - OS:
 
-## Additional context
+## Additional Context
 
-Logs, backtraces, or a minimal reproduction if available.
+<!-- Logs, backtraces, or a minimal reproduction if available. -->
