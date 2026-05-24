@@ -29,6 +29,7 @@ if is_lib {
 // release-plz reads squash-merged PR titles, so it's gated the same way.
 if !publish {
     file::delete(".github/workflows/release-plz.yml");
+    file::delete("release-plz.toml");
     file::delete(".github/workflows/pr-title.yml");
 }
 if !(is_lib && publish) {
