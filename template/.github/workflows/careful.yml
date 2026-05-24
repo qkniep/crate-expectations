@@ -1,15 +1,22 @@
 name: cargo-careful
 
-# Execute tests carefully, with extra checking along the way.
-# See: https://github.com/RalfJung/cargo-careful
+# Runs the test suite against a std rebuilt with extra debug assertions to catch
+# UB. See: https://github.com/RalfJung/cargo-careful
+#
+# Scheduled weekly rather than per-PR: it's a UB safety net with no value under the
+# default `unsafe_code = "forbid"`, PRs already run miri + sanitizers for UB, and
+# rebuilding std on nightly is the priciest of the three. Run it from the Actions
+# tab when touching unsafe code.
 
 permissions:
   contents: read
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
+  schedule:
+    # Mondays at 06:00 UTC. Note: scheduled runs only fire on the default branch.
+    - cron: "0 6 * * 1"
+  # Allow manual runs from the Actions tab.
+  workflow_dispatch:
 
 concurrency:
   group: careful-${{ github.ref }}
