@@ -2,8 +2,9 @@
 # platforms. Git auto-detects binary files and leaves them untouched.
 * text=auto eol=lf
 
-# GitHub's language bar (computed by Linguist) only counts `programming` and
-# `markup` languages by default; YAML is type `data`, so it's excluded. This
-# repo is largely workflow YAML, so mark it detectable to reflect that.
-*.yml  linguist-detectable=true
-*.yaml linguist-detectable=true
+# GitHub's language bar (computed by Linguist) excludes this repo's YAML for two
+# independent reasons: YAML is a `data` language (omitted from stats by default),
+# and every YAML file lives under .github/, which Linguist treats as vendored.
+# Override both so the workflow YAML is counted.
+*.yml  linguist-detectable=true linguist-vendored=false
+*.yaml linguist-detectable=true linguist-vendored=false
