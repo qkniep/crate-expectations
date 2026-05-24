@@ -11,7 +11,7 @@ updates:
       semver-patch-days: 3
     open-pull-requests-limit: 10
     commit-message:
-      prefix: "deps"
+      prefix: "chore"
       include: "scope"
     labels:
       - "type: dependencies"
