@@ -8,6 +8,9 @@
 {%- if coverage %}
 [![codecov](https://codecov.io/gh/{{ gh_username }}/{{ project-name }}/branch/main/graph/badge.svg)](https://codecov.io/gh/{{ gh_username }}/{{ project-name }})
 {%- endif %}
+{%- if scorecard and publish %}
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/{{ gh_username }}/{{ project-name }}/badge)](https://scorecard.dev/viewer/?uri=github.com/{{ gh_username }}/{{ project-name }})
+{%- endif %}
 {%- if publish %}
 [![license](https://img.shields.io/crates/l/{{ project-name }}.svg)](#license)
 {%- else %}
