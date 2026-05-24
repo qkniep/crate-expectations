@@ -1,5 +1,9 @@
 name: Benchmarks
 
+# Compile-check only: plain `cargo bench` numbers aren't tracked across runs,
+# and shared GitHub runners have variable CPU/thermal behavior, so timing
+# gates flag false regressions there.
+
 permissions:
   contents: read
 
@@ -20,9 +24,5 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/rust-setup
 
-      # Compile-check only: plain `cargo bench` numbers aren't tracked across runs,
-      # and shared GitHub runners have variable CPU/thermal behavior, so timing
-      # gates flag false regressions there. Enable `bench_gating` at generation
-      # time for a CodSpeed-based perf-regression workflow instead.
       - name: Benchmarks (compile)
         run: cargo bench --no-run --locked
