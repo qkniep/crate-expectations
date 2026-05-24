@@ -58,7 +58,7 @@ cargo generate --git https://github.com/qkniep/rust-template.git template \
 | `fuzzing` | bool (`false`) | cargo-fuzz target scaffold + a CI smoke run. |
 | `miri` | bool (`false`) | Runs tests under Miri (UB detection) in CI. |
 | `sanitizers` | bool (`false`) | ASan/LeakSan/TSan CI matrix. |
-| `careful` | bool (`false`) | Runs tests under cargo-careful in CI. |
+| `careful` | `off` \| `weekly` \| `pr` (tracks `unsafe_policy`: `deny`→`pr`, `forbid`→`weekly`) | Runs tests under cargo-careful in CI. `pr` gates every PR; `weekly` is a scheduled sweep on `main`; `off` disables it. |
 | `feature_powerset` | bool (`false`) | cargo-hack workflow type-checking every feature combination (mirrors `just hack`). |
 | `scorecard` | bool (`false`) | OSSF Scorecard supply-chain analysis workflow (adds a badge when `publish` is also set). |
 | `gh_username` | string (`qkniep`) | GitHub owner used in URLs and badges. |
