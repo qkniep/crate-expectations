@@ -1,5 +1,7 @@
 name: Fuzz
 
+# Short smoke runs on every push/PR to catch regressions and crashes quickly.
+
 permissions:
   contents: read
 
@@ -31,9 +33,5 @@ jobs:
         with:
           tool: cargo-fuzz
 
-      # A short smoke run on every push/PR: enough to catch regressions and crashes
-      # quickly without burning CI minutes. Run longer campaigns out of band (the
-      # `just fuzz` recipe, or a scheduled workflow) and commit interesting inputs
-      # to fuzz/corpus to seed future runs.
       - name: Fuzz (smoke run)
         run: cargo +nightly fuzz run fuzz_target_1 -- -max_total_time=60 -timeout=10
