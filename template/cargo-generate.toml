@@ -56,7 +56,8 @@ msrv       = { type = "bool", prompt = "CI: pin & verify a minimum supported Rus
 fuzzing    = { type = "bool", prompt = "Include a cargo-fuzz target + CI?", default = false }
 miri       = { type = "bool", prompt = "CI: run tests under Miri (UB detection)?", default = false }
 sanitizers = { type = "bool", prompt = "CI: run tests under Address/Leak/Thread sanitizers?", default = false }
-careful    = { type = "bool", prompt = "CI: run tests under cargo-careful?", default = false }
+# `careful` is a 3-way cadence (off|weekly|pr) whose default tracks `unsafe_policy`;
+# it's defined in the [conditional] blocks below.
 feature_powerset = { type = "bool", prompt = "CI: type-check the feature powerset with cargo-hack?", default = false }
 scorecard  = { type = "bool", prompt = "CI: OSSF Scorecard supply-chain analysis?", default = false }
 
@@ -72,3 +73,15 @@ publish = { type = "bool", prompt = "Publish to crates.io (cargo install)?", def
 # --- Benchmark-only prompt ------------------------------------------------
 [conditional.'benchmarks == true'.placeholders]
 bench_gating = { type = "bool", prompt = "CI: gate benchmarks against perf regressions (CodSpeed)?", default = false }
+
+# --- cargo-careful cadence (default tracks unsafe_policy) ------------------
+# cargo-careful catches UB by running the suite against a hardened std. The
+# cadence matches where UB can be introduced: under `deny` you can write unsafe
+# in a PR, so gate every PR (`pr`); under `forbid` your own code has none, so a
+# weekly sweep on main is enough to catch UB reaching you through dependencies
+# (`weekly`). `off` opts out. pre-script.rhai installs the matching careful*.yml.
+[conditional.'unsafe_policy == "deny"'.placeholders]
+careful = { type = "string", prompt = "CI: run tests under cargo-careful?", choices = ["off", "weekly", "pr"], default = "pr" }
+
+[conditional.'unsafe_policy == "forbid"'.placeholders]
+careful = { type = "string", prompt = "CI: run tests under cargo-careful?", choices = ["off", "weekly", "pr"], default = "weekly" }

@@ -9,7 +9,7 @@ default:
 # Install the dev tools `just check` (and the optional recipes) need.
 setup:
     rustup toolchain install nightly --component rustfmt{% if miri %},miri{% endif %}
-    cargo install --locked cargo-nextest cargo-deny cargo-machete typos-cli{% if coverage %} cargo-llvm-cov{% endif %}{% if careful %} cargo-careful{% endif %}{% if fuzzing %} cargo-fuzz{% endif %}{% if feature_powerset %} cargo-hack{% endif %}
+    cargo install --locked cargo-nextest cargo-deny cargo-machete typos-cli{% if coverage %} cargo-llvm-cov{% endif %}{% if careful != "off" %} cargo-careful{% endif %}{% if fuzzing %} cargo-fuzz{% endif %}{% if feature_powerset %} cargo-hack{% endif %}
 
 # Full local check suite (mirrors the core CI).
 check: _check-tools fmt clippy build test doc deny machete typos{% if benchmarks %} bench-build{% endif %}
@@ -80,7 +80,7 @@ coverage:
 miri:
     cargo +nightly miri nextest run --all-features
 {% endif -%}
-{%- if careful %}
+{%- if careful != "off" %}
 # Run tests under cargo-careful for extra runtime UB checks (nightly).
 careful:
     cargo +nightly careful test --all-features
