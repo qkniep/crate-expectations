@@ -22,15 +22,12 @@ jobs:
         sanitizer: [address, leak, thread]
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
       # Sanitizers need to recompile std with instrumentation (-Zbuild-std), which
       # requires the rust-src component on a nightly toolchain.
-      - name: Install nightly + rust-src
-        uses: dtolnay/rust-toolchain@5b842231ba77f5c045dba54ac5560fed2db780e2 # nightly
+      - uses: ./.github/actions/rust-setup
         with:
+          toolchain: nightly
           components: rust-src
-
-      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
 
       - name: Test under ${{ matrix.sanitizer }} sanitizer
         env:

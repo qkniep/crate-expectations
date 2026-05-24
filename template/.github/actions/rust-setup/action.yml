@@ -1,23 +1,40 @@
 name: "Rust setup"
-description: "Installs Rust toolchain, tools, and configures caching"
+description: "Installs a Rust toolchain, components, targets, and tools, and configures caching"
 
 inputs:
   toolchain:
+    description: "Rust toolchain to install: stable, nightly, or an explicit version."
     required: false
     default: stable
+  components:
+    description: "Comma-separated rustup components (e.g. rust-src, miri). Empty installs none."
+    required: false
+    default: "rustfmt, clippy"
+  targets:
+    description: "Comma-separated cross-compilation targets (e.g. thumbv7em-none-eabihf). Empty installs none."
+    required: false
+    default: ""
   tools:
     description: "Comma-separated cargo tools to install via taiki-e/install-action (e.g. nextest, cargo-deny). Empty installs none."
+    required: false
+    default: ""
+  workspaces:
+    description: "Passed to Swatinem/rust-cache; set when the Cargo workspace isn't at the repo root (e.g. fuzz)."
     required: false
     default: ""
 
 runs:
   using: "composite"
   steps:
+    # The `# stable` pin tracks the dtolnay action's release tag (what `just unpin`
+    # reverts to); the Rust toolchain actually installed is whatever the `toolchain`
+    # input selects, so this single pin serves stable and nightly callers alike.
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
       with:
         toolchain: ${{ inputs.toolchain }}
-        components: rustfmt, clippy
+        components: ${{ inputs.components }}
+        targets: ${{ inputs.targets }}
 
     - name: Install cargo tools
       if: inputs.tools != ''
@@ -29,6 +46,7 @@ runs:
       uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
       with:
         cache-all-crates: true
+        workspaces: ${{ inputs.workspaces }}
 
     # generate lockfile if not committed yet
     - name: Ensure Cargo.lock
