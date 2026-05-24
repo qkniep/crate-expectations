@@ -24,18 +24,11 @@ jobs:
       MIRIFLAGS: "-Zmiri-strict-provenance"
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
-      - name: Install nightly + Miri
-        uses: dtolnay/rust-toolchain@5b842231ba77f5c045dba54ac5560fed2db780e2 # nightly
+      - uses: ./.github/actions/rust-setup
         with:
+          toolchain: nightly
           components: miri
-
-      - name: Install nextest
-        uses: taiki-e/install-action@6c1f7cf125e42770ff087ea443901b487cc5471a # v2
-        with:
-          tool: cargo-nextest
-
-      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+          tools: cargo-nextest
 
       - name: Miri test
         run: cargo +nightly miri nextest run --all-features
