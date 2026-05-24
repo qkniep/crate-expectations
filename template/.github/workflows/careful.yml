@@ -1,5 +1,8 @@
 name: cargo-careful
 
+# Execute tests carefully, with extra checking along the way.
+# See: https://github.com/RalfJung/cargo-careful
+
 permissions:
   contents: read
 
