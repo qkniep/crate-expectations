@@ -1,0 +1,9 @@
+# Normalize line endings to LF in the repository and on checkout across all
+# platforms. Git auto-detects binary files and leaves them untouched.
+* text=auto eol=lf
+
+# GitHub's language bar (computed by Linguist) only counts `programming` and
+# `markup` languages by default; YAML is type `data`, so it's excluded. This
+# repo is largely workflow YAML, so mark it detectable to reflect that.
+*.yml  linguist-detectable=true
+*.yaml linguist-detectable=true
