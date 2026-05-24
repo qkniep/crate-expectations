@@ -15,9 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 # This is the always-on core suite. Optional checks live in their own workflow
-# files (coverage.yml, msrv.yml, semver.yml, bench.yml, miri.yml, sanitizers.yml,
-# careful.yml, scorecard.yml, no-std.yml) so a project can drop one by deleting a
-# single file — which is exactly what the generator does for unselected options.
+# files (coverage.yml, msrv.yml, semver.yml, bench-gating.yml, miri.yml,
+# sanitizers.yml, careful.yml, scorecard.yml, no-std.yml) so a project can drop
+# one by deleting a single file.
 jobs:
   fmt:
     runs-on: ubuntu-latest
