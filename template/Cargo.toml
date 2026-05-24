@@ -1,12 +1,12 @@
 [package]
 name = "{{ project-name }}"
-edition = "2024"
-rust-version = "1.90"
 version = "0.1.0"
 authors = ["{{ authors }}"]
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/{{ gh_username }}/{{ project-name }}"
+edition = "2024"
+rust-version = "1.90"
 description = "{{ description }}"
+repository = "https://github.com/{{ gh_username }}/{{ project-name }}"
+license = "MIT OR Apache-2.0"
 {% if publish -%}
 keywords = []   # TODO: up to 5 search terms, e.g. ["cli", "parser"]
 categories = [] # TODO: slugs from https://crates.io/category_slugs
@@ -24,6 +24,13 @@ include = [
 ]
 {% else -%}
 publish = false
+{% endif -%}
+{% if publish %}
+# Build docs the way docs.rs does: all features, with `--cfg docsrs` so you can
+# gate feature-specific docs behind `#[cfg_attr(docsrs, doc(cfg(...)))]`.
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
 {% endif %}
 {% if no_std -%}
 [features]
@@ -36,7 +43,7 @@ std = []
 # Optional features go here. Gate the corresponding item with
 # `#[cfg(feature = "...")]` and annotate it with
 # `#[cfg_attr(docsrs, doc(cfg(feature = "...")))]` so docs.rs shows a feature
-# badge (see src/lib.rs). docs.rs builds with `all-features = true` below.
+# badge (see src/lib.rs).{% if publish %} docs.rs builds with `all-features = true` above.{% endif %}
 # [features]
 # default = []
 # foo = []
@@ -64,18 +71,11 @@ unsafe_code = "{{ unsafe_policy }}"
 unreachable_pub = "warn"
 missing_debug_implementations = "warn"
 {%- if kind == "library" %}
-# `missing_docs` lives in `src/lib.rs` (#![warn(missing_docs)]) so it applies to
-# the library API only, not the test/bench crates.
+# `missing_docs` lives in `src/lib.rs` (#![warn(missing_docs)])
+# so it applies to the library API only, not the test/bench crates.
 {%- endif %}
 
 [lints.clippy]
 all = { level = "warn", priority = -1 }
 # Opt in to stricter linting by uncommenting:
 # pedantic = { level = "warn", priority = -1 }
-{% if publish %}
-# Build docs the way docs.rs does: all features, with `--cfg docsrs` so you can
-# gate feature-specific docs behind `#[cfg_attr(docsrs, doc(cfg(...)))]`.
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
-{% endif -%}
