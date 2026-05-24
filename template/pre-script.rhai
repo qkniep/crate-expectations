@@ -44,7 +44,6 @@ if !is_no_std {
 // --- Capabilities ---------------------------------------------------------
 if !variable::get("benchmarks") {
     file::delete("benches");
-    file::delete(".github/workflows/bench.yml");
 }
 // bench_gating only exists when benchmarks were enabled; remove its workflow
 // whenever gating is off (or benchmarks were never included at all).
