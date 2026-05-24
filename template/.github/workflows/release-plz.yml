@@ -2,14 +2,29 @@
 #   * "release-plz-pr" opens/updates a release PR that bumps the version and
 #     updates CHANGELOG.md from the Conventional Commit titles of your
 #     squash-merged PRs (enforced by pr-title.yml).
-#   * "release-plz-release" publishes to crates.io and tags the release once that
-#     PR is merged.
+#   * "release-plz-release" publishes to crates.io and tags the release ONLY when
+#     that PR is merged. release-plz.toml sets `release_always = false`, so a plain
+#     push to main never publishes — merging the release PR is your deliberate
+#     "publish now" signal, and the first version (0.1.0) is gated like any other.
+#
+# This uses a GitHub App token instead of the default GITHUB_TOKEN because the
+# default token (a) is blocked from opening PRs unless you flip a repo setting and
+# (b) cannot trigger other workflows — so the release PR would skip CI and the
+# release tag would never fire release-dist.yml. An App token fixes all three.
 #
 # Setup required:
-#   1. Add a CARGO_REGISTRY_TOKEN repository secret (a crates.io API token).
-#   2. Settings > Actions > General > Workflow permissions:
-#      enable "Read and write permissions" and
-#      "Allow GitHub Actions to create and approve pull requests".
+#   1. Create a GitHub App (Settings > Developer settings > GitHub Apps) with
+#      repository permissions Contents: Read & write and Pull requests: Read &
+#      write. Install it on this repo and generate a private key.
+#   2. Add repository secrets APP_ID (the App's ID) and APP_PRIVATE_KEY (the
+#      private key contents), plus CARGO_REGISTRY_TOKEN (a crates.io API token).
+#
+# Simpler alternative: delete the "Generate a token" steps, drop
+# `persist-credentials: false`, and set `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}`
+# on both release-plz steps. Then enable Settings > Actions > General > Workflow
+# permissions > "Read and write permissions" and "Allow GitHub Actions to create
+# and approve pull requests". Caveat: the release PR won't run CI and the release
+# tag won't trigger release-dist.yml.
 name: Release-plz
 
 permissions:
@@ -25,9 +40,16 @@ jobs:
     name: Release-plz release
     runs-on: ubuntu-latest
     steps:
+      - name: Generate a token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
         with:
           toolchain: stable
@@ -36,7 +58,7 @@ jobs:
         with:
           command: release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
   release-plz-pr:
@@ -46,9 +68,16 @@ jobs:
       group: release-plz-${{ github.ref }}
       cancel-in-progress: false
     steps:
+      - name: Generate a token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
         with:
           toolchain: stable
@@ -57,5 +86,5 @@ jobs:
         with:
           command: release-pr
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
