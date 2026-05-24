@@ -20,20 +20,12 @@ runs:
       with:
         tool: nextest,cargo-deny,cargo-machete
 
-    # `target/` and the cargo registry are cached here. We deliberately don't
-    # also run sccache: two compilation caches in one job are redundant and can
-    # work against each other. rust-cache alone is simpler and faster for a
-    # library-sized crate; reach for sccache only on large dependency graphs.
     - name: Rust cache
       uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
       with:
         cache-all-crates: true
 
-    # cargo-generate ships no Cargo.lock, so a freshly generated project has none
-    # until its first local build. Generate one here so the `--locked` steps in the
-    # jobs that use this action work on the very first push — keeping the README's
-    # "green from the first commit" promise. A no-op once a lock is committed, so
-    # `--locked`'s drift detection stays fully intact.
+    # generate lockfile if not committed yet
     - name: Ensure Cargo.lock
       shell: bash
       run: test -f Cargo.lock || cargo generate-lockfile
