@@ -8,8 +8,15 @@ default:
 # `just` itself isn't here — bootstrap it with `cargo install just`.
 # Install the dev tools `just check` (and the optional recipes) need.
 setup:
+    #!/usr/bin/env bash
+    set -euo pipefail
     rustup toolchain install nightly --component rustfmt{% if miri %},miri{% endif %}
-    cargo install --locked cargo-nextest cargo-deny cargo-machete typos-cli{% if coverage %} cargo-llvm-cov{% endif %}{% if careful != "off" %} cargo-careful{% endif %}{% if fuzzing %} cargo-fuzz{% endif %}{% if feature_powerset %} cargo-hack{% endif %}
+    tools=(cargo-nextest cargo-deny cargo-machete typos-cli)
+    {% if coverage %}tools+=(cargo-llvm-cov){% endif %}
+    {% if careful != "off" %}tools+=(cargo-careful){% endif %}
+    {% if fuzzing %}tools+=(cargo-fuzz){% endif %}
+    {% if feature_powerset %}tools+=(cargo-hack){% endif %}
+    cargo install --locked "${tools[@]}"
 
 # Full local check suite (mirrors the core CI).
 check: _check-tools fmt clippy build test doc deny machete typos{% if benchmarks %} bench-build{% endif %}
