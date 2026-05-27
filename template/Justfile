@@ -25,9 +25,17 @@ check: _check-tools fmt clippy build test doc deny machete typos{% if benchmarks
 fmt:
     cargo +nightly fmt --all -- --check
 
+# Apply formatting (nightly rustfmt).
+fmt-fix:
+    cargo +nightly fmt --all
+
 # Lint with clippy, denying warnings.
 clippy:
     cargo clippy --all-targets --all-features -- -D warnings
+
+# Apply clippy's machine-applicable suggestions.
+clippy-fix:
+    cargo clippy --fix --all-targets --all-features --allow-dirty --allow-staged
 
 # Build all targets in release mode.
 build: _lockfile
