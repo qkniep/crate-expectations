@@ -1,5 +1,6 @@
 version: 2
-# Keeps the actions used by this template's own self-test workflow up to date.
+# Keeps the actions used by this template's own self-test workflow up to date,
+# and the actions baked into the template/ scaffold so generated projects don't start out stale.
 # Generated projects ship their own dependabot config (template/.github/dependabot.yml).
 updates:
   - package-ecosystem: "github-actions"
@@ -14,6 +15,20 @@ updates:
       include: "scope"
     groups:
       # Actions are SHA-pinned, so simply group all, regardless of SemVer.
+      github-actions:
+        patterns:
+          - "*"
+  - package-ecosystem: "github-actions"
+    directory: "/template"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 5
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    groups:
       github-actions:
         patterns:
           - "*"
