@@ -7,7 +7,7 @@ inputs:
     required: false
     default: stable
   components:
-    description: "Comma-separated rustup components (e.g. rust-src, miri). Empty installs rustfmt and clippy."
+    description: "Comma-separated rustup components (e.g. rust-src, miri). Omit to get the default `rustfmt, clippy`; pass an explicit empty string to install no extra components."
     required: false
     default: "rustfmt, clippy"
   targets:
@@ -19,7 +19,7 @@ inputs:
     required: false
     default: ""
   workspaces:
-    description: "Passed to Swatinem/rust-cache; set when the Cargo workspace isn't at the repo root (e.g. fuzz)."
+    description: "Passed to actions-rust-lang/setup-rust-toolchain as `cache-workspaces`; use when a Cargo workspace is not at the repo root. Each entry is `path` (target dir defaults to `target`) or `path -> custom-target` for a non-default target dir; e.g. `fuzz`."
     required: false
     default: ""
 
