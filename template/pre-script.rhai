@@ -17,8 +17,11 @@ if is_lib {
     file::delete("src/main.rs");
 }
 
-// Cross-platform release artifacts only make sense for binaries.
-if is_lib {
+// Cross-platform release artifacts only make sense for a *published* binary:
+// the release tag cut by release-plz-app.yml is what fires release-dist.yml (see
+// the publishing section below), so a library or an unpublished binary would
+// only ship a workflow nothing can ever trigger.
+if is_lib || !publish {
     file::delete(".github/workflows/release-dist.yml");
 }
 
@@ -101,3 +104,9 @@ if !variable::get("feature_powerset") {
 if !variable::get("scorecard") {
     file::delete(".github/workflows/scorecard.yml");
 }
+
+// --- Clean up -------------------------------------------------------------
+// cargo-generate strips its own cargo-generate.toml from the output but not the
+// hook scripts that file references, so remove this one ourselves — it has no
+// place in the generated project.
+file::delete("pre-script.rhai");
