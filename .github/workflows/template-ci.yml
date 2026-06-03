@@ -61,7 +61,7 @@ jobs:
           components: clippy
 
       - name: Install dev tools
-        uses: taiki-e/install-action@f48d2f8ba2b452934c948b7be1a768079c3632ff # v2
+        uses: taiki-e/install-action@873c7452cadb7c034694a1282227095d93fbdf92 # v2
         with:
           tool: just,cargo-nextest,cargo-deny,cargo-machete,typos
 
