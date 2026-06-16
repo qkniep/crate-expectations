@@ -19,7 +19,11 @@ updates:
         patterns:
           - "*"
   - package-ecosystem: "github-actions"
-    directory: "/template"
+    # github-actions only descends into `.github/workflows` when directory is "/";
+    # for any other directory it scans that directory's immediate *.yml files only
+    directories:
+      - "/template/.github/workflows"
+      - "/template/.github/actions/rust-setup"
     schedule:
       interval: "weekly"
     cooldown:
