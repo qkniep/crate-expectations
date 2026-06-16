@@ -107,10 +107,15 @@ so when you change templating logic, mirror it into the matrix.
 
 ## Conventions in generated projects
 
-- GitHub Actions are **SHA-pinned** with a `# vX` / `# stable` trailing comment
-  recording the tracked tag. The generated `just unpin` recipe reverts every pin
-  to its mutable tag; Dependabot updates either form. Keep new `uses:` entries
-  SHA-pinned with the tag comment.
+- GitHub Actions are **SHA-pinned** with a **full-version** `# vX.Y.Z` trailing
+  comment (the most specific tag the SHA carries, e.g. `# v2.9` when an action
+  only tags to minor). This matters: Dependabot only reliably bumps a SHA pin
+  whose comment is a *full* version — a bare `# vX` major comment is left frozen,
+  because its rewriter rebuilds the comment from the new SHA's most-specific tag
+  and only fires when the old comment ends with a real tag. The generated
+  `just unpin` recipe reverts each pin to a moving tag (`vN`, or `v0.N` for 0.x),
+  falling back to the comment's exact version when the action ships no moving
+  tag. Keep new `uses:` entries SHA-pinned with a full-version comment.
 - Least-privilege tokens: workflows declare read-only `permissions:` at the top
   and scope up per-job only where a write is needed.
 - A binary archetype keeps **both** `src/lib.rs` (the logic — stays unit/doc-

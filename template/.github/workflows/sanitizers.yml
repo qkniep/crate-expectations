@@ -21,7 +21,7 @@ jobs:
       matrix:
         sanitizer: [address, leak, thread]
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       # Sanitizers need to recompile std with instrumentation (-Zbuild-std), which
       # requires the rust-src component on a nightly toolchain.
       - uses: ./.github/actions/rust-setup
