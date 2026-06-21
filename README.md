@@ -54,6 +54,7 @@ cargo generate qkniep/crate-expectations \
 | `kind` | `library` \| `binary` (`library`) | `binary` adds `src/main.rs` (a thin entry point over `src/lib.rs`); a *published* `binary` also ships the cross-platform release workflow. |
 | `unsafe_policy` | `forbid` \| `deny` (`forbid`) | Sets `unsafe_code` in `[lints]`. `deny` allows opt-in `#[allow(unsafe_code)]` with justification; `forbid` permits none. |
 | `publish` | bool (lib `true`, bin `false`) | Adds crates.io metadata, docs.rs config, the `include` allowlist, release-plz, and (library) SemVer checks. For a `binary` it also gates the cross-platform release workflow, whose tag release-plz cuts. |
+| `release_app_token` | bool (`false`, published library) | Drives release-plz with a GitHub App token (`APP_ID`/`APP_PRIVATE_KEY` secrets) instead of the built-in `GITHUB_TOKEN`, so CI runs on the release PR and branch protection's required checks can gate it. A published `binary` always uses the App token. |
 | `no_std` | bool (`false`, library only) | Adds `#![no_std]` with an optional `std` feature and a bare-metal target build in CI. |
 | `coverage` | bool (`true`) | cargo-llvm-cov + Codecov workflow and badge. |
 | `benchmarks` | bool (`true`) | Criterion benches + a compile-check CI job. |

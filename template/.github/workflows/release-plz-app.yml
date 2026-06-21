@@ -8,10 +8,12 @@
 #     "publish now" signal, and the first version (0.1.0) is gated like any other.
 #
 # This workflow uses a GitHub App token instead of the built-in GITHUB_TOKEN,
-# which can't trigger other workflows: a release tag created with it would never
-# fire release-dist.yml, so no cross-platform binaries would be built. The App
-# token fires that workflow, also runs CI on the release PR, and needs no repo
-# settings flipped.
+# whose events can't trigger other workflows. That matters in two cases, and the
+# App token covers both with no repo settings flipped:
+#   * a published binary's release tag must fire release-dist.yml to build the
+#     cross-platform artifacts — GITHUB_TOKEN would leave that workflow unrun;
+#   * CI must run on the release PR so branch protection's required status checks
+#     can gate it — a GITHUB_TOKEN-opened PR gets no checks and can't be merged.
 #
 # Setup:
 #   1. Create a GitHub App (Settings > Developer settings > GitHub Apps) with

@@ -45,9 +45,11 @@ YAML.** When a capability needs a CI change:
   multiple files and `file::rename` the chosen one into place. Existing examples:
   - `careful.yml` (weekly) vs `careful-pr.yml` (per-PR) — a 3-way `off|weekly|pr`
     cadence; keep one, rename, or delete both.
-  - `release-plz.yml` (library, built-in `GITHUB_TOKEN`) vs `release-plz-app.yml`
-    (binary, GitHub App token — the default token can't trigger the downstream
-    `release-dist.yml`).
+  - `release-plz.yml` (built-in `GITHUB_TOKEN`) vs `release-plz-app.yml` (GitHub
+    App token — the default token can't trigger downstream workflows). A binary
+    always takes the App variant (its release tag must fire `release-dist.yml`); a
+    library defaults to `GITHUB_TOKEN` but `release_app_token` opts into the App
+    variant so CI can gate the release PR under branch protection.
 
 `pre-script.rhai` reads always-set capability bools directly via
 `variable::get(...)`; archetype-conditional prompts (`publish`, `no_std`,
