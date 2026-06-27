@@ -63,8 +63,13 @@ feature_powerset = { type = "bool", prompt = "CI: type-check the feature powerse
 scorecard  = { type = "bool", prompt = "CI: OSSF Scorecard supply-chain analysis?", default = false }
 
 # --- Library-only prompts -------------------------------------------------
+# `release_app_token` only takes effect when `publish` is true (cargo-generate
+# can't gate one conditional prompt on another, so it's asked for every library
+# and ignored by pre-script.rhai for unpublished ones). A published binary always
+# uses the App token, so it isn't asked there.
 [conditional.'kind == "library"'.placeholders]
 publish = { type = "bool", prompt = "Publish to crates.io (release-plz + semver checks)?", default = true }
+release_app_token = { type = "bool", prompt = "Releases: drive release-plz with a GitHub App token so CI gates the release PR (needed if `main` requires status checks)?", default = false }
 no_std  = { type = "bool", prompt = "no_std crate (with an optional `std` feature)?", default = false }
 
 # --- Binary-only prompts --------------------------------------------------
