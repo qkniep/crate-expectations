@@ -1,4 +1,4 @@
-// Copyright (c) {{ authors }}
+// SPDX-FileCopyrightText: {{ authors }}
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 {% if no_std -%}

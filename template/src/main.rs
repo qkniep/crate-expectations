@@ -1,4 +1,4 @@
-// Copyright (c) {{ authors }}
+// SPDX-FileCopyrightText: {{ authors }}
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 //! Thin binary entry point. Keep logic in the library (`src/lib.rs`) so it stays
