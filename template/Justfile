@@ -66,10 +66,11 @@ typos:
 actionlint:
     actionlint
 
-# Revert every SHA-pinned action (@<sha> # vX.Y.Z) to a mutable tag ref.
 # Actions ship SHA-pinned for supply-chain safety; run this once if you'd rather
 # track tags. Prefers the moving major tag the action publishes (vN, or v0.N for
 # 0.x) and falls back to the comment's exact version when no such tag exists.
+
+# Revert every SHA-pinned action (@<sha> # vX.Y.Z) to a mutable tag ref.
 unpin:
     #!/usr/bin/env bash
     set -euo pipefail
