@@ -1,6 +1,14 @@
 /todo.txt
-*.swp
-*.swo
-*~
-.DS_Store
 .env
+
+# === Claude Code ===
+# Ignore all local/runtime state under .claude/, then allow-list shared config.
+.claude/*
+
+# Shared, team-useful config (commit these):
+!.claude/settings.json
+!.claude/commands/
+!.claude/agents/
+!.claude/skills/
+!.claude/hooks/
+!.claude/output-styles/
