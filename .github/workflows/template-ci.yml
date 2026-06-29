@@ -42,9 +42,11 @@ jobs:
           # workflows (miri, sanitizers, ...) are validated by actionlint below.
           - name: no_std-security-library
             args: "-d kind=library -d no_std=true -d unsafe_policy=deny -d miri=true -d sanitizers=true -d careful=pr -d feature_powerset=true -d scorecard=true -d fuzzing=true -d bench_gating=true"
-          # Proves capabilities are decoupled from archetype (fuzzing on a normal lib).
+          # Proves capabilities are decoupled from archetype (fuzzing on a normal
+          # lib) and exercises the library App-token release path: release_app_token
+          # swaps in release-plz-app.yml, which actionlint then validates.
           - name: library-with-fuzzing
-            args: "-d kind=library -d publish=true -d fuzzing=true"
+            args: "-d kind=library -d publish=true -d fuzzing=true -d release_app_token=true"
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 

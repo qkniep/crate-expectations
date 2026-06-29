@@ -31,16 +31,19 @@ if is_lib || !publish {
 // semver checks are library-only. The PR-title lint only matters because
 // release-plz reads squash-merged PR titles, so it's gated the same way.
 //
-// Two release-plz workflows ship and exactly one survives, chosen by archetype:
-// a library drives release-plz with the built-in GITHUB_TOKEN (release-plz.yml),
-// but a binary needs a GitHub App token (release-plz-app.yml) so the release tag
-// can fire release-dist.yml — the default token can't trigger other workflows.
+// Two release-plz workflows ship and exactly one survives. A binary always needs
+// a GitHub App token (release-plz-app.yml) so its release tag can fire
+// release-dist.yml — the built-in GITHUB_TOKEN can't trigger other workflows. A
+// library defaults to that built-in token (release-plz.yml, zero secrets), but
+// `release_app_token` switches it to the App variant too, so CI runs on the
+// release PR and branch protection's required checks can gate it.
+let release_app_token = variable::is_set("release_app_token") && variable::get("release_app_token");
 if !publish {
     file::delete(".github/workflows/release-plz.yml");
     file::delete(".github/workflows/release-plz-app.yml");
     file::delete("release-plz.toml");
     file::delete(".github/workflows/pr-title.yml");
-} else if is_lib {
+} else if is_lib && !release_app_token {
     file::delete(".github/workflows/release-plz-app.yml");
 } else {
     file::delete(".github/workflows/release-plz.yml");
