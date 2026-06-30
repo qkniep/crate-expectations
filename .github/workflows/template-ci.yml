@@ -52,23 +52,23 @@ jobs:
 
       # nightly provides `cargo +nightly fmt`; stable is installed last so it is
       # the default toolchain `just check` builds and tests with.
-      - uses: actions-rust-lang/setup-rust-toolchain@46268bd060767258de96ed93c1251119784f2ab6 # v1.16.1
+      - uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
         with:
           toolchain: nightly
           components: rustfmt
           cache: false
-      - uses: actions-rust-lang/setup-rust-toolchain@46268bd060767258de96ed93c1251119784f2ab6 # v1.16.1
+      - uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
         with:
           toolchain: stable
           components: clippy
 
       - name: Install dev tools
-        uses: taiki-e/install-action@b8cecb83565409bcc297b2df6e77f030b2a468d5 # v2.82.0
+        uses: taiki-e/install-action@682e7d9e49c5e653d371fc6adbda67653461378a # v2.82.4
         with:
           tool: just,cargo-nextest,cargo-deny,cargo-machete,typos
 
       - name: Install cargo-generate
-        uses: cargo-bins/cargo-binstall@30b5ca8b54e1dcffd9548bc87ede1531310fdc67 # v1.20.0
+        uses: cargo-bins/cargo-binstall@732870f031d2fb36309d0deaf36abcc704a7be65 # v1.20.1
       # --force: rust-cache can restore cargo's install ledger
       # (.crates2.json) without the matching ~/.cargo/bin binary, after which a
       # plain `binstall` sees "already installed" and skips, leaving no
@@ -111,13 +111,13 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - uses: actions-rust-lang/setup-rust-toolchain@46268bd060767258de96ed93c1251119784f2ab6 # v1.16.1
+      - uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
         with:
           toolchain: stable
           target: thumbv7em-none-eabihf
 
       - name: Install cargo-generate
-        uses: cargo-bins/cargo-binstall@30b5ca8b54e1dcffd9548bc87ede1531310fdc67 # v1.20.0
+        uses: cargo-bins/cargo-binstall@732870f031d2fb36309d0deaf36abcc704a7be65 # v1.20.1
       # --force: rust-cache can restore cargo's install ledger
       # (.crates2.json) without the matching ~/.cargo/bin binary, after which a
       # plain `binstall` sees "already installed" and skips, leaving no
