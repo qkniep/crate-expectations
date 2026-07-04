@@ -23,6 +23,15 @@
 # fire a tag-triggered release workflow, which GITHUB_TOKEN also can't), use a
 # GitHub App token or PAT instead — the template's `release_app_token` prompt
 # wires up the App variant for you: https://release-plz.dev/docs/github/token
+#
+# GATED TO PUBLIC REPOS: both jobs carry `if: !github.event.repository.private`.
+# On a private repo release-plz can't authenticate the git operations it runs in
+# its own temporary clones (`git fetch origin main` hits an interactive credential
+# prompt and fails), so it churns the release PR — closing it and opening a new one
+# on every push to main. You also don't publish to crates.io while private. So the
+# jobs stay inert until you make the repo public, then resume automatically. (To
+# run release-plz while private instead, drop the `if` guards and inject the token
+# as a GLOBAL git credential so its temp clones can auth.)
 name: Release-plz
 
 permissions:
@@ -37,6 +46,7 @@ jobs:
   release-plz-release:
     name: Release-plz release
     runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.private }} # public repos only — see header
     concurrency:
       group: release-plz-release-${{ github.ref }}
       cancel-in-progress: false
@@ -60,6 +70,7 @@ jobs:
   release-plz-pr:
     name: Release-plz PR
     runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.private }} # public repos only — see header
     concurrency:
       group: release-plz-${{ github.ref }}
       cancel-in-progress: false
