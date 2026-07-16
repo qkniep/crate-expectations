@@ -28,14 +28,16 @@
 # its own temporary clones (`git fetch origin main` hits an interactive credential
 # prompt and fails), so it churns the release PR — closing it and opening a new one
 # on every push to main. You also don't publish to crates.io while private. So the
-# jobs stay inert until you make the repo public, then resume automatically. (To
-# run release-plz while private instead, drop the `if` guards and inject the token
-# as a GLOBAL git credential so its temp clones can auth.)
+# jobs stay inert until you make the repo public, then resume on the next push to
+# main — flipping visibility emits a `public` event, not a `push`, so nothing runs
+# at the flip itself. (To run release-plz while private instead, drop the `if`
+# guards and inject the token as a GLOBAL git credential so its temp clones can auth.)
 name: Release-plz
 
+# The App token minted below does all the writes; the built-in GITHUB_TOKEN is
+# only used by checkout, so read access is all this workflow needs.
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 on:
   push:
@@ -99,5 +101,6 @@ jobs:
         with:
           command: release-pr
         env:
+          # No CARGO_REGISTRY_TOKEN here: release-pr never publishes, so the
+          # publish secret stays scoped to the release job above.
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
