@@ -15,6 +15,12 @@ on:
     paths: [".github/labels.yml"]
   workflow_dispatch:
 
+# Serialize label syncs so a slow older run can't finish last and revert to a
+# stale spec; cancel-in-progress is safe as the sync is declarative/idempotent.
+concurrency:
+  group: labeler-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   labeler:
     runs-on: ubuntu-latest
@@ -24,6 +30,8 @@ jobs:
       issues: write # create/update/delete labels
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Sync labels
         uses: crazy-max/ghaction-github-labeler@548a7c3603594ec17c819e1239f281a3b801ab4d # v6.0.0
