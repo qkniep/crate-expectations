@@ -63,12 +63,12 @@ jobs:
           components: clippy
 
       - name: Install dev tools
-        uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2.90.1
+        uses: taiki-e/install-action@cfdb7ed4ccc7c7dce37759eae89dc5674b469b39 # v2.90.3
         with:
           tool: just,cargo-nextest,cargo-deny,cargo-machete,typos
 
       - name: Install cargo-generate
-        uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # v1.26.2
+        uses: cargo-bins/cargo-binstall@5885714d0a40a14b2535c6ffc051fd8e49aa9665 # v1.27.0
       # --force: rust-cache can restore cargo's install ledger
       # (.crates2.json) without the matching ~/.cargo/bin binary, after which a
       # plain `binstall` sees "already installed" and skips, leaving no
@@ -117,7 +117,7 @@ jobs:
           target: thumbv7em-none-eabihf
 
       - name: Install cargo-generate
-        uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # v1.26.2
+        uses: cargo-bins/cargo-binstall@5885714d0a40a14b2535c6ffc051fd8e49aa9665 # v1.27.0
       # --force: rust-cache can restore cargo's install ledger
       # (.crates2.json) without the matching ~/.cargo/bin binary, after which a
       # plain `binstall` sees "already installed" and skips, leaving no
